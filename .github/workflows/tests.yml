@@ -1,0 +1,23 @@
+name: Tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements-lock.txt
+      - run: python -m pip install -r requirements-lock.txt
+      - run: python -m pip install --no-build-isolation --no-deps -e .
+      - run: python -m pytest -ra
+      - run: can-lab demo --steps 10 --output /tmp/can-lab-demo.json
+      - run: python examples/make_ev_fixture.py /tmp/synthetic-ev.xlsx
+      - run: can-lab analyze-xlsx /tmp/synthetic-ev.xlsx --profile /tmp/synthetic-ev.profile.json --output-prefix /tmp/synthetic-ev-analysis

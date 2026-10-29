@@ -1,0 +1,11 @@
+VERSION "Original simulator protocol; NOT a production vehicle DBC"
+NS_ :
+BS_:
+BU_: ECU Dashboard
+
+BO_ 256 EngineData: 8 ECU
+ SG_ rpm : 7|16@0+ (1,0) [0|65535] "rpm" Dashboard
+ SG_ speed_kmh : 16|8@1+ (1,0) [0|255] "km/h" Dashboard
+
+BO_ 512 BatteryData: 8 ECU
+ SG_ battery_temperature_c : 0|8@1+ (1,0) [0|255] "degC" Dashboard
