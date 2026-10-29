@@ -1,0 +1,21 @@
+{
+  "dataset_id": "Translab-SCUT/Electric-vehicle-operation-data vehicle#1 public month",
+  "units": {
+    "vhc_speed": "km/h", "vhc_totalMile": "km", "hv_voltage": "V", "hv_current": "A",
+    "bcell_maxVoltage": "V", "bcell_minVoltage": "V", "bcell_maxTemp": "degC", "bcell_minTemp": "degC"
+  },
+  "unit_references": {
+    "vhc_speed": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md",
+    "vhc_totalMile": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md",
+    "hv_voltage": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md",
+    "hv_current": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md",
+    "bcell_maxVoltage": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md",
+    "bcell_minVoltage": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md",
+    "bcell_maxTemp": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md",
+    "bcell_minTemp": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md"
+  },
+  "status_codes": {"1": "charging mode", "3": "driving mode"},
+  "status_reference": "https://github.com/Translab-SCUT/Electric-vehicle-operation-data/blob/f3bc3eb9132c46fc75e3e60662515dbaf7325c98/README.md",
+  "time_unit": "MDDHHMMSS", "time_basis": "relative", "current_convention": "unknown",
+  "reference": "Units and status labels documented in upstream README. Timestamp encoding inferred from supplied values and calendar/cadence consistency; year/timezone/current polarity/SOC scale not established. No vehicle specifications imported."
+}

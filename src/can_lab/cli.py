@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 from can import CanError
+from . import __version__
 from .telemetry import validate_series
 from .io import export_csv, export_json, load_candump, load_csv, load_json
 
@@ -40,6 +41,7 @@ def demo(steps):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='Automotive CAN & Telemetry Laboratory')
+    parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
     commands = parser.add_subparsers(dest='command', required=True)
     demo_parser = commands.add_parser('demo', help='bounded in-process virtual CAN communication')
     demo_parser.add_argument('--steps', type=positive_int, default=100)
@@ -52,13 +54,16 @@ def main(argv=None):
     importer.add_argument('--source')
     importer.add_argument('--profile', type=Path, help='JSON object with columns and units mappings')
     importer.add_argument('--max-gap-s', type=float)
-    workbook = commands.add_parser('analyze-xlsx', help='quality-annotated decoded EV workbook analysis')
-    workbook.add_argument('input', type=Path)
-    workbook.add_argument('--profile', type=Path)
-    workbook.add_argument('--quality-config', type=Path)
-    workbook.add_argument('--sheet')
-    workbook.add_argument('--max-rows', type=positive_int, default=250000)
-    workbook.add_argument('--output-prefix', type=Path, required=True)
+    for workbook_command in ('analyze-xlsx', 'report-xlsx'):
+        workbook = commands.add_parser(workbook_command, help='quality-annotated decoded EV workbook analysis/report')
+        workbook.add_argument('input', type=Path)
+        workbook.add_argument('--profile', type=Path)
+        workbook.add_argument('--quality-config', type=Path)
+        workbook.add_argument('--engineering-config', type=Path)
+        workbook.add_argument('--include-features', action='store_true', help='also export all engineering observation features to CSV')
+        workbook.add_argument('--sheet')
+        workbook.add_argument('--max-rows', type=positive_int, default=250000)
+        workbook.add_argument('--output-prefix', type=Path, required=True)
     for name in ('simulate', 'receive'):
         command = commands.add_parser(name)
         command.add_argument('--interface', default='socketcan', choices=['socketcan'])
@@ -70,7 +75,7 @@ def main(argv=None):
             command.add_argument('--output', type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.command == 'analyze-xlsx':
+        if args.command in ('analyze-xlsx', 'report-xlsx'):
             from .workbook_cli import analyze
             return analyze(args)
         if args.command == 'demo':

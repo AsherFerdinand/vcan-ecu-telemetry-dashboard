@@ -1,8 +1,61 @@
-# Automotive CAN & Telemetry Laboratory
+# Virtual ECU & CAN Lab — Automotive Telemetry, Diagnostics & Test Automation
 
-Phase 1 and Phase 2 evolution of the existing Virtual CAN Bus ECU Telemetry Simulator.
+v0.3: Phase 1, Phase 2 and Phase 3 evolution of the existing Virtual CAN Bus ECU Telemetry Simulator.
 The original Git history, sine-wave ECU model, standard CAN IDs, payload layout,
 and `can_project/` entry points are preserved.
+
+## Two operating modes
+
+**Virtual CAN Laboratory** retains the original synthetic ECU model, python-can
+communication, SocketCAN workflow, verified synthetic DBC and portable virtual demo.
+
+**Real-World EV Diagnostics** imports already decoded telemetry. It now adds
+candidate operating states, signed power/energy with explicit coverage, cell
+spreads and sensor-screening indicators, possible sessions and engineering reports.
+Excel measurements are never presented as authentic OEM CAN frames.
+
+```text
+Synthetic ECU -> CAN transport -> synthetic DBC -> canonical telemetry
+Decoded recordings -> provenance + quality -> engineering analysis -> UI / reports
+```
+
+The [v0.3 engineering guide](docs/engineering_v0.3.md) documents architecture,
+math, defaults, file responsibilities, dashboard views and reproduction steps.
+The [validation record](docs/validation.md) contains executed tests and full SCUT
+workbook results. No SOH/ML model, confirmed battery-defect classifier or verified
+vehicle-efficiency claim is included.
+
+## v0.3 engineering workflow
+
+With the pinned environment below installed:
+
+```bash
+python examples/make_ev_fixture.py /tmp/synthetic-v03.xlsx
+can-lab report-xlsx /tmp/synthetic-v03.xlsx \
+  --profile /tmp/synthetic-v03.profile.json \
+  --engineering-config examples/engineering_config.json \
+  --output-prefix outputs/synthetic-v03 --include-features
+```
+
+Reports include provenance, measurement coverage, candidate dynamics, electrical
+relationships, signed-energy coverage, cell diagnostics, possible-session
+statistics and limitations. JSON is machine-readable, Markdown is human-readable,
+and optional CSV contains annotated engineering features. Existing recording
+exports remain available. No PDF or additional plotting dependency is required.
+
+The real-world dashboard offers Overview, Vehicle Dynamics, Battery Electrical,
+Battery Health Indicators, Session Explorer, Diagnostics, Recorded Replay, and
+source exports. Shared time/session selection controls synchronized telemetry;
+replay also shows current operating candidates, power and temperature.
+
+Energy is integrated only over usable adjacent intervals within a configurable
+maximum (30 s by default), never across detected boundaries. Positive/negative
+signed components are not charging/discharging labels. Regeneration candidates
+require a dedicated current-polarity reference, not just negative current. Session
+SOC change remains in raw source units when its percentage scale is unknown.
+Distance-qualified signed kWh/km is withheld when interval coverage does not match
+and is never presented as verified efficiency. Thresholds are research screening
+heuristics, not OEM specifications.
 
 ## Capabilities and boundaries
 
@@ -30,13 +83,24 @@ and suspicious measurements. It adds configurable data-quality checks, vehicle
 dynamics inspection, cell-temperature plots, signed battery power, and
 play/pause/reset replay without CAN hardware or invented CAN identifiers.
 
-**The actual workbook and its signal documentation were not available.** Support
-is implemented against the supplied schema and synthetic tests. Source units,
-charging-status codes and current polarity default to unverified. Numeric raw
-values remain inspectable; normalization requires explicit unit declarations.
+The public `vehicle#1.xlsx` has now been checked across all **81,898** rows.
+Its source README documents most units and charging codes, but not the year,
+timezone, current polarity, SOC scale or exact timestamp encoding. The configurable
+`MDDHHMMSS` interpretation fits every calendar value and the supplied minute
+rollover; it remains explicitly **inferred** and never invents a year. See the
+[full source review](docs/validation.md#public-vehicle1-source-review-and-qualityvisualization-correction).
+
+In the dashboard, enable **Use source-reviewed SCUT profile (timestamp encoding
+remains inferred)** for this specific public workbook. It provides elapsed time,
+source-documented units/status labels, and 10-second cadence screening. SOC units
+and current polarity remain unknown. Without this explicit selection, numeric
+raw timestamps retain the unverified-time fallback. Physical, metadata, time and
+missing-data counts are independent; legacy conservative flags remain available.
+Shared interval/possible-segment controls synchronize plots and break lines at
+possible recording boundaries. Yearless calendar parsing is not a Unix decoder.
+
 Signed power is `V × I / 1000` only when input units/values permit it. Unknown
-polarity never receives charging/discharging labels. No energy/efficiency or
-battery-health estimate is fabricated.
+polarity never receives charging/discharging sign labels. No verified-efficiency or battery-health estimate is asserted; v0.3 adds qualified signed energy over accepted intervals.
 
 Generate and analyze a clearly synthetic workbook:
 
@@ -46,7 +110,7 @@ can-lab analyze-xlsx /tmp/synthetic-ev.xlsx \
   --profile /tmp/synthetic-ev.profile.json --output-prefix outputs/synthetic-ev
 ```
 
-For `vehicle#1.xlsx`, select **Real-World EV Dataset**, upload your local file,
+For a compatible local `vehicle#1.xlsx`, select **Real-World EV Dataset**, upload your local file,
 and configure the correct worksheet, dataset ID, time representation, source
 units and optional documented current convention under **Source profile and
 quality thresholds**. A profile JSON can supply those declarations. Do not reuse

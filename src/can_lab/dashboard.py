@@ -7,6 +7,7 @@ from can_lab.telemetry import SIGNALS
 
 st.set_page_config(page_title='Automotive Telemetry Lab', layout='wide')
 st.title('Automotive CAN & Telemetry Laboratory')
+st.caption('Virtual ECU & CAN Lab v0.3 — Automotive Telemetry, Diagnostics & Test Automation')
 st.caption('Sparse observations in canonical units. No interpolation or forward filling. '
            'Synthetic CAN definitions are not vehicle-specific definitions.')
 source = st.selectbox('Data Source', ['Virtual ECU Simulation', 'Imported CAN Log', 'Real-World EV Dataset'], key='data_source')

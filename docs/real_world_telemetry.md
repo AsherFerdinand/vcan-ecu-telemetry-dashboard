@@ -1,3 +1,5 @@
+> v0.3 integrates this preserved Phase 2 pipeline with operating-state, signed-energy, cell and session analysis. See [engineering_v0.3.md](engineering_v0.3.md) for the new calculations and reports.
+
 # Phase 2: decoded EV recordings, diagnostics and replay
 
 ## Architecture
@@ -24,24 +26,26 @@ not raw CAN frames. Source filename alone does not establish a vehicle identity.
 
 ## Dataset status and attribution
 
-The task identifies **Electric Vehicle Operation Data**, targeting `vehicle#1.xlsx`,
-and supplies the column names below. No actual workbook, DOI, publisher URL,
-authors, version, license or signal dictionary was available during development.
-On 2026-10-29, DataCite title discovery and Mendeley Data searches were attempted;
-both were denied by the environment's HTTPS proxy (403). Therefore:
+The initial schema-only implementation has now been checked against the public
+[Translab-SCUT source](https://github.com/Translab-SCUT/Electric-vehicle-operation-data)
+at revision `f3bc3eb9132c46fc75e3e60662515dbaf7325c98`, including all **81,898**
+observations from its `vehicle#1.zip` workbook. Earlier source-search attempts
+were denied, but this supplied repository's README and raw archive were accessible.
+The dataset remains outside Git. See `docs/validation.md` for its SHA-256,
+full timestamp/quality results, and the exact scope of verification.
 
-- The mapping below is **task-schema-based**, not verified against a real workbook.
-- Dataset units, current polarity, charging-status codes and edition are unverified.
-- No dataset-specific license or author attribution is guessed. Before using a
-  downloaded recording, record its publisher URL/DOI, authors, edition, license,
-  required citation and permitted redistribution from the actual primary source.
-- No real dataset is redistributed. `datasets/` and `.xlsx` files are ignored;
-  tests generate small synthetic workbooks. The generated example explicitly
-  identifies itself as synthetic. Real-workbook validation remains pending.
+The README documents eight numerical source-column units and charging codes
+1 (charging mode) / 3 (driving mode). It does not specify the timestamp encoding,
+year, timezone, current polarity, or explicit SOC scale. The packaged
+`src/can_lab/data/translab_scut_vehicle1_review.json` profile records exact pinned
+source references for supported units/status labels. It leaves SOC/polarity
+unknown and marks `MDDHHMMSS` time interpretation as inferred. Units are not
+verified merely by plausibility of a signal's magnitude.
 
-Use a profile's `dataset_id` and `reference` fields to retain the actual identifier,
-edition and documentation citation once available. Those fields are user-supplied
-provenance, not proof that an external source has been independently verified.
+No dataset license permitting redistribution was established. Cite the primary
+repository and revision when reproducing this review, and obtain its actual
+license/attribution requirements and any paper/DOI before redistribution. No
+license, authors, recording year, vehicle specification or current sign is invented.
 
 ## Source mapping
 
@@ -59,7 +63,7 @@ provenance, not proof that an external source has been independently verified.
 | `bcell_maxTemp` | `cell_temperature_max_c` | degC |
 | `bcell_minTemp` | `cell_temperature_min_c` | degC |
 
-These are target units, **not verified source units**. Without a declaration,
+These are target units. Generic imports do not assume source units; the source-reviewed profile documents the eight numerical units listed above, leaving SOC scale unknown. Without a declaration,
 numeric raw values can be inspected with `source units UNVERIFIED` labels; the
 corresponding normalized values remain null. No missing voltage/current/SOC/RPM
 is fabricated. Cell temperature extrema are not relabeled as pack-average
@@ -71,7 +75,7 @@ battery temperature. Unknown extra source columns are retained in `raw`.
 conversions include m/s or mph -> km/h, m -> km, mV -> V (pack and cells), mA -> A,
 SOC fraction -> percent, K -> degC. Unsupported declarations fail explicitly.
 Metadata records both declared source units and target units; declarations have
-`unit_status: user_declared`, and column meanings stay `task_schema_unverified`.
+`unit_status: user_declared`; the cited preset uses `source_documented` for documented units/meanings. Other meanings remain explicitly unverified.
 
 Default `time_unit: datetime` accepts native Excel dates and ISO-8601 strings,
 not ambiguous numeric serial values. Native Excel dates are interpreted by
@@ -132,8 +136,7 @@ one. It never infers the convention from current sign, voltage or charging codes
 Missing, nonnumeric, out-of-range or unit-unverified inputs yield null power.
 Suspect but numeric input values may produce power with propagated input flags;
 unknown polarity adds `SUSPECT`. Raw inputs are never deleted. Formula, units,
-polarity, alignment and invalid-input policy are exported. No energy consumption,
-efficiency, battery capacity or health estimates are implemented.
+polarity, alignment and invalid-input policy are exported. The Phase 2 power module itself does not integrate energy. v0.3 adds separately qualified signed-energy analysis; verified efficiency, capacity and battery-health estimates remain unimplemented.
 
 Acceleration is an adjacent backward difference of normalized speed:
 `a = (speed_kmh[i] - speed_kmh[i-1]) / 3.6 / dt`.
@@ -227,8 +230,7 @@ only on demand through temporary files; browser downloads still require transfer
 buffers. Chart ranges include suspect observations. For substantially larger
 recordings, a next milestone is chunked on-disk storage and indexed replay.
 
-Actual `vehicle#1.xlsx` format, meanings, license and current polarity remain
-unverified. Native SocketCAN hardware/kernel validation is separate and remains
+The public workbook format, supported units/status codes and full row count are now inspected. Timestamp encoding remains inferred; recording year/timezone, license, SOC scale and current polarity remain unverified. Native SocketCAN hardware/kernel validation is separate and remains
 unclaimed. All Phase 2 automated tests use synthetic workbooks.
 
 ## Implementation files
@@ -246,3 +248,54 @@ unclaimed. All Phase 2 automated tests use synthetic workbooks.
 | `pyproject.toml`, `requirements-lock.txt`, `.github/workflows/tests.yml` | Optional Excel dependencies, version lock and CI |
 
 See `docs/validation.md` for executed checks and remaining limitations.
+
+
+## Source review: independent dimensions and synchronized intervals
+
+`recording_review.py` provides independent dimensions under
+`quality_summary(recording)["dimensions"]`, timestamp-representation inspection,
+raw-step reports and possible boundary detection. It never treats a
+`unit_unverified` or `status_codes_unverified` flag alone as physical invalidity.
+Original conservative flags and combined counts are retained. Numerical
+plausibility and physical heuristic suspicion can overlap (for example, a constant
+finite temperature can be in range but trigger a flatline heuristic).
+Unverified numeric time is separate from invalid clock values. A cadence gap can
+be an anomaly without making its parsed timestamp invalid.
+
+Use the explicit SCUT preset checkbox in the UI, or:
+
+```bash
+can-lab analyze-xlsx '/path/to/vehicle#1.xlsx' \
+  --profile src/can_lab/data/translab_scut_vehicle1_review.json \
+  --output-prefix outputs/vehicle1-review
+```
+
+For a custom profile, `time_unit: "MDDHHMMSS"` splits the final eight digits as
+DD/HH/MM/SS and the leading one/two digits as month. It validates component ranges
+and calendar month lengths. Elapsed seconds are measured from the first parsable
+value without a synthetic year, timezone or Unix origin. Negative/resets are not
+repaired. February-crossing elapsed intervals require an explicit
+`calendar_leap` choice if their length is otherwise ambiguous; year rollover is
+not silently inferred. Within the reviewed April recording that ambiguity does
+not arise. The source README does not prove this encoding, so every such import
+retains `time_interpretation_status: inferred_yearless_encoding` and raw times.
+
+The preset uses source-documented units/status codes with exact README URLs via
+`unit_references`, `status_codes`, and `status_reference`. Unknown/unlisted status
+codes remain metadata warnings. Numeric SOC is shown in source units, not
+silently assumed percent. The measured current remains in original polarity.
+
+Shared row/time sliders and possible-segment selection control every chart,
+including the synchronized overview. `recording_plots.py` creates line groups
+before display sampling, so missing values and inferred boundaries cannot be
+bridged by downsampling. Row-index fallback is clearly labeled NOT time and draws
+points without continuity assertions. Possible gap boundaries use configurable
+`session_gap_s` or `session_gap_factor` (default 10 times nominal interval); they
+are not proven trips. Optional `raw_max_step` thresholds use explicitly configured
+source units, not guessed per-second rates. Raw step reports include elapsed
+interval/boundary context where possible.
+
+Full diagnostics are cached per import/profile/configuration; interval changes do
+not reparse the workbook. Only bounded plot data is duplicated for display.
+Exports retain the original cells and now include independent summaries,
+timestamp evidence, anomaly statistics and source references in diagnostic JSON.

@@ -2,6 +2,8 @@
 from dataclasses import asdict
 from datetime import date, datetime
 import hashlib
+import re
+from collections import Counter
 from zipfile import BadZipFile
 from openpyxl.utils.exceptions import InvalidFileException
 from pathlib import Path
@@ -15,8 +17,11 @@ class TimestampParser:
         self.profile = profile
         self.origin = None
         self.awareness = None
+        self.encoded_origin = None
 
     def parse(self, value):
+        if self.profile.time_unit == 'MDDHHMMSS':
+            return self.parse_encoded(value)
         if self.profile.time_unit != 'datetime':
             value = numeric(value)
             if value is None:
@@ -28,6 +33,8 @@ class TimestampParser:
         try:
             # ISO-8601 or native Excel datetime; no locale/date-format guessing.
             if isinstance(value, str):
+                if not re.match(r'^\d{4}-\d{2}-\d{2}(?:[T ]|$)', value):
+                    return None, 'unverified_non_iso_timestamp_representation'
                 value = datetime.fromisoformat(value.replace('Z', '+00:00'))
             stamp = pd.Timestamp(value)
             if pd.isna(stamp):
@@ -51,6 +58,37 @@ class TimestampParser:
             return result, None
         except (ValueError, TypeError, OverflowError):
             return None, 'invalid_datetime'
+
+
+    def parse_encoded(self, value):
+        """Explicit yearless interpretation; no Unix epoch or invented year."""
+        if isinstance(value, bool):
+            return None, 'invalid_encoded_timestamp'
+        if isinstance(value, float):
+            if numeric(value) is None or not value.is_integer():
+                return None, 'invalid_encoded_timestamp'
+            value = int(value)
+        text = str(value).strip()
+        if not re.fullmatch(r'\d{9,10}', text):
+            return None, 'invalid_encoded_timestamp'
+        month, day, hour, minute, second = int(text[:-8]), int(text[-8:-6]), int(text[-6:-4]), int(text[-4:-2]), int(text[-2:])
+        month_days = [31, 29 if self.profile.calendar_leap is not False else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        if not (1 <= month <= 12 and 1 <= day <= month_days[month - 1] and 0 <= hour < 24 and 0 <= minute < 60 and 0 <= second < 60):
+            return None, 'invalid_encoded_calendar_components'
+        components = (month, day, hour, minute, second)
+        if self.encoded_origin is None:
+            self.encoded_origin = (components, text)
+        origin = self.encoded_origin[0]
+        if month < origin[0]:
+            return None, 'yearless_rollover_or_clock_reversal'
+        if self.profile.calendar_leap is None and min(month, origin[0]) <= 2 < max(month, origin[0]):
+            return None, 'yearless_february_elapsed_ambiguous'
+        # The February length cancels for intervals on the same side of February.
+        def seconds(parts):
+            m, d, h, minute, sec = parts
+            return (sum(month_days[:m-1]) + d - 1) * 86400 + h * 3600 + minute * 60 + sec
+        result = float(seconds(components) - seconds(origin))
+        return result, 'before_recording_origin' if result < 0 else None
 
 
 def load_xlsx(source, *, profile=None, sheet=None, max_rows=250_000, filename=None):
@@ -80,8 +118,9 @@ def load_xlsx(source, *, profile=None, sheet=None, max_rows=250_000, filename=No
         if sheet is not None and sheet not in workbook.sheetnames:
             raise ValueError(f'unknown worksheet: {sheet}')
         worksheet = workbook[sheet or workbook.sheetnames[0]]
-        rows = worksheet.iter_rows(values_only=True)
-        header = next(rows, None)
+        rows = worksheet.iter_rows()
+        header_cells = next(rows, None)
+        header = [cell.value for cell in header_cells] if header_cells else None
         if not header:
             raise ValueError('worksheet is empty')
         # Ignore only trailing empty header cells; reject ambiguity inside the table.
@@ -97,7 +136,7 @@ def load_xlsx(source, *, profile=None, sheet=None, max_rows=250_000, filename=No
         missing = [column for column in COLUMNS if column not in header]
         if missing:
             warnings_list.append('Missing source columns: ' + ', '.join(missing))
-        warnings_list.append('Column meanings follow the supplied task schema; dataset documentation and edition are unverified.')
+        warnings_list.append('Some units/meanings are source-documented; remaining uncertainties are listed in profile and per-signal metadata.' if profile.unit_references else 'Column meanings follow the supplied task schema; dataset documentation and edition are unverified.')
         undeclared = [column for column, (_, unit) in COLUMNS.items() if unit is not None and column in header and column not in profile.units]
         if undeclared:
             warnings_list.append('Source units unverified: ' + ', '.join(undeclared))
@@ -105,7 +144,11 @@ def load_xlsx(source, *, profile=None, sheet=None, max_rows=250_000, filename=No
             warnings_list.append('Current polarity unverified: signed electrical power has no charging/discharging labels.')
         parser = TimestampParser(profile)
         observations = []
-        for row_number, cells in enumerate(rows, 2):
+        time_formats = Counter()
+        for row_number, excel_cells in enumerate(rows, 2):
+            cells = [cell.value for cell in excel_cells]
+            if 'time' in header:
+                time_formats[excel_cells[header.index('time')].number_format] += 1
             # Entirely blank rows are observations too: preserve recording order and flag them.
             if len(observations) >= max_rows:
                 raise ValueError(f'workbook exceeds max_rows={max_rows}; increase the explicit limit or split the workbook')
@@ -122,8 +165,8 @@ def load_xlsx(source, *, profile=None, sheet=None, max_rows=250_000, filename=No
             raise ValueError('worksheet has no observations')
         signals = {target: {
             'source_column': column, 'source_unit': profile.units.get(column),
-            'canonical_unit': canonical, 'unit_status': 'user_declared' if column in profile.units else 'unverified',
-            'meaning_status': 'task_schema_unverified',
+            'canonical_unit': canonical, 'unit_status': ('source_documented' if column in profile.unit_references else 'user_declared') if column in profile.units else 'unverified',
+            'meaning_status': 'source_documented' if column in profile.unit_references or (column == 'charging_signal' and profile.status_reference) else 'task_schema_unverified', 'unit_reference': profile.unit_references.get(column),
             'present': column in header,
         } for column, (target, canonical) in COLUMNS.items()}
         metadata = {
@@ -133,7 +176,10 @@ def load_xlsx(source, *, profile=None, sheet=None, max_rows=250_000, filename=No
             'available_sheets': workbook.sheetnames, 'source_columns': header,
             'profile': asdict(profile), 'signals': signals,
             'normalized_time_basis': profile.time_basis,
-            'time_origin': parser.origin.isoformat() if parser.origin is not None else None,
+            'time_origin': (parser.origin.isoformat() if parser.origin is not None else
+                            {'components': parser.encoded_origin[0], 'raw': parser.encoded_origin[1], 'year': None} if parser.encoded_origin else None),
+            'time_interpretation_status': 'inferred_yearless_encoding' if profile.time_unit == 'MDDHHMMSS' else 'profile_declared',
+            'excel_time_number_formats': dict(time_formats), 'excel_date_system_origin': workbook.epoch.isoformat(),
             'warnings': warnings_list,
         }
         return Recording(metadata, observations)

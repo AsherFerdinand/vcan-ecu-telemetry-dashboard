@@ -11,7 +11,7 @@ def calculate_power(recording):
         'input_alignment': 'voltage and current from the same original observation only',
         'invalid_policy': 'missing, nonnumeric, OUT_OF_RANGE, or unverified-unit inputs yield null; other suspect inputs retained and flagged',
     }
-    recording.metadata['derived_signals'] = {'signed_power_kw': definition}
+    recording.metadata.setdefault('derived_signals', {})['signed_power_kw'] = definition
     for row in recording.observations:
         quality = []
         for signal in ('battery_voltage_v', 'battery_current_measured_a'):

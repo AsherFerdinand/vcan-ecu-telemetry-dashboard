@@ -1,0 +1,20 @@
+{
+  "operating": {
+    "smoothing_samples": 3,
+    "stationary_speed_kmh": 0.5,
+    "acceleration_threshold_m_s2": 0.15,
+    "deceleration_threshold_m_s2": 0.15,
+    "constant_speed_tolerance_m_s2": 0.05,
+    "max_derivative_interval_s": 30,
+    "regenerative_power_threshold_kw": 0.5
+  },
+  "energy": {"max_interval_s": 30, "max_distance_speed_kmh": 350},
+  "cells": {
+    "max_voltage_spread_v": 0.25,
+    "max_temperature_spread_c": 20,
+    "max_voltage_spread_rate_v_s": 0.1,
+    "max_temperature_rate_c_s": 5,
+    "max_trend_interval_s": 30
+  },
+  "power_histogram_bins": 20
+}

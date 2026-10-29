@@ -21,3 +21,4 @@ jobs:
       - run: can-lab demo --steps 10 --output /tmp/can-lab-demo.json
       - run: python examples/make_ev_fixture.py /tmp/synthetic-ev.xlsx
       - run: can-lab analyze-xlsx /tmp/synthetic-ev.xlsx --profile /tmp/synthetic-ev.profile.json --output-prefix /tmp/synthetic-ev-analysis
+      - run: can-lab report-xlsx /tmp/synthetic-ev.xlsx --profile /tmp/synthetic-ev.profile.json --output-prefix /tmp/synthetic-engineering --include-features

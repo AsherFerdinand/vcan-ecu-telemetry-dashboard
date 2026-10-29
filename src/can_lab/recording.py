@@ -62,15 +62,32 @@ class DatasetProfile:
     time_unit: str = 'datetime'  # datetime/ISO only by default; numeric units must be declared
     time_basis: str = 'relative'
     current_convention: str = 'unknown'
+    current_reference: str = ''  # distinct evidence for polarity; generic profile citation is insufficient
+    calendar_leap: bool | None = None  # only needed for elapsed intervals crossing February
+    unit_references: dict[str, str] = field(default_factory=dict)
+    status_codes: dict[str, str] = field(default_factory=dict)
+    status_reference: str = ''
     reference: str = ''  # caller-supplied documentation citation; not an automatic verification
 
     def __post_init__(self):
         if not isinstance(self.dataset_id, str) or not self.dataset_id.strip():
             raise ValueError('dataset_id must be nonempty')
-        if self.time_unit not in ('datetime', 's', 'ms', 'us'):
-            raise ValueError('time_unit must be datetime, s, ms or us')
+        if self.time_unit not in ('datetime', 's', 'ms', 'us', 'MDDHHMMSS'):
+            raise ValueError('time_unit must be datetime, s, ms, us or MDDHHMMSS')
+        if self.time_unit == 'MDDHHMMSS' and self.time_basis != 'relative':
+            raise ValueError('yearless MDDHHMMSS supports relative elapsed time only')
+        if self.calendar_leap is not None and type(self.calendar_leap) is not bool:
+            raise ValueError('calendar_leap must be true, false or null')
+        if not isinstance(self.unit_references, dict) or any(k not in self.units or not isinstance(v, str) or not v.strip() for k, v in self.unit_references.items()):
+            raise ValueError('unit references must cite declared source columns')
+        if not isinstance(self.status_codes, dict) or any(not isinstance(k, str) or not isinstance(v, str) for k, v in self.status_codes.items()):
+            raise ValueError('status_codes must map source code strings to labels')
+        if self.status_codes and not self.status_reference:
+            raise ValueError('status code definitions require a source reference')
         if self.time_basis not in ('relative', 'unix'):
             raise ValueError('time_basis must be relative or unix')
+        if not isinstance(self.current_reference, str):
+            raise ValueError('current_reference must be a documentation string')
         if self.current_convention not in ('unknown', 'positive_discharge', 'positive_charge'):
             raise ValueError('unknown current convention')
         if not isinstance(self.units, dict):

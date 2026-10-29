@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "automotive-can-lab"
-version = "0.2.0"
+version = "0.3.0"
 description = "Synthetic CAN communication and transport-independent automotive telemetry"
 requires-python = ">=3.12"
 dependencies = ["python-can>=4.6,<5", "cantools>=40,<42"]
@@ -21,7 +21,7 @@ can-lab = "can_lab.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-can_lab = ["data/*.dbc"]
+can_lab = ["data/*.dbc", "data/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

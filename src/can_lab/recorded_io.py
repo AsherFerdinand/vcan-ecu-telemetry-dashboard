@@ -60,10 +60,13 @@ def load_annotated_csv(stream):
     return Recording(metadata, rows)
 
 
-def export_diagnostic_summary(recording, stream):
+def export_diagnostic_summary(recording, stream, *, summary=None, timestamp_evidence=None, anomaly_review=None):
+    from .recording_review import inspect_timestamps, anomaly_report
     powers = [row.derived['signed_power_kw']['value'] for row in recording.observations
               if row.derived.get('signed_power_kw', {}).get('value') is not None]
-    json.dump({'metadata': recording.metadata, 'quality': quality_summary(recording),
+    json.dump({'metadata': recording.metadata, 'quality': summary if summary is not None else quality_summary(recording),
+               'timestamp_evidence': timestamp_evidence if timestamp_evidence is not None else inspect_timestamps(recording),
+               'anomaly_review': anomaly_review if anomaly_review is not None else anomaly_report(recording),
                'duration_s': recording.duration_s(),
                'signed_power_kw': {'min': min(powers) if powers else None, 'max': max(powers) if powers else None}},
               stream, indent=2, allow_nan=False)
