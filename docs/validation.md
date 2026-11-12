@@ -492,3 +492,29 @@ owner-managed backup, identified by SHA-256. They were not removed. See
 [retention policy](data_artifacts.md). Final tracked/output inventory is available
 through the read-only `storage-audit` command at the pushed revision; clean-source
 example reports are opt-in and not part of Git.
+
+### Executed installation and runtime checks
+
+At implementation commit `f5e852b141cf02772360619d63d417eec16a87e5`:
+
+- Full suite: **263 passed** in 15.52 s; all 215 baseline tests retained.
+- A shallow single-branch fresh clone installed from `requirements-lock.txt` plus
+  `pip install --no-deps --no-build-isolation .`; import resolved to the installed
+  `site-packages/can_lab`, version `0.4.0.dev0`, rather than the original checkout.
+  Existing dependency runtime was deliberately reused to avoid duplicating roughly
+  493 MB. This verifies fresh-source installation, **not a pristine OS/new-venv test**.
+- Fresh-checkout suite: **263 passed** in 15.68 s, without downloading research data.
+  `pip check` reported no broken requirements. All 47 local documentation links/
+  headings passed the offline checker.
+- Virtual CAN demo: 20 samples processed, zero flagged. Existing regression tests
+  exercised synthetic DBC, replay and telemetry exports.
+- Fresh-checkout synthetic investigation: four decoded frames, all five manual
+  references passed; compact JSON/Markdown plus manifest created only on request.
+  Manifest recorded the clean implementation commit and complete input/DBC hashes.
+- Streamlit started headlessly from the fresh checkout; `/_stcore/health` returned
+  `ok`. Streamlit AppTest regressions exercised the new workspace, bounded scan,
+  engineering analysis and requested report preparation, not just HTTP startup.
+
+No historical archive was needed. The verification clone is a small shallow source
+checkout, not a copied research dataset or another full dependency environment.
+Native Windows/macOS and physical CAN hardware remain untested in this execution.
