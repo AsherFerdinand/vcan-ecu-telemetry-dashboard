@@ -23,3 +23,33 @@ datasets/
 
 # Research workbooks stay local; tests generate small synthetic fixtures.
 *.xlsx
+
+# Research inputs/archives and reproducible model/build artifacts are not source.
+data/*
+!data/README.md
+!data/manifests/
+data/manifests/*
+!data/manifests/*.json
+*.zip
+*.tar
+*.gz
+*.bz2
+*.xz
+*.zst
+*.7z
+*.log
+*.csv
+*.blf
+*.mf4
+*.mdf
+*.asc
+*.parquet
+*.pt
+*.pth
+*.onnx
+*.ckpt
+# Deliberately selected tiny authored fixtures; no research-capture exceptions.
+!tests/fixtures/synthetic.log
+!tests/fixtures/synthetic.csv
+!tests/fixtures/mapped.csv
+!tests/fixtures/raw_can/example.log

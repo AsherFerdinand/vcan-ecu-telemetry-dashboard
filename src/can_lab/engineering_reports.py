@@ -2,6 +2,7 @@
 import csv
 import json
 from .engineering import numeric_range
+from . import __version__
 
 
 def build_report(recording,analysis):
@@ -11,7 +12,7 @@ def build_report(recording,analysis):
         for target,issues in ((voltage_flags,point.voltage_quality),(temperature_flags,point.temperature_quality)):
             for issue in set(issues):target[issue]=target.get(issue,0)+1
     return {
-        'schema':'can-lab-engineering-report-1','software_version':'0.3.0',
+        'schema':'can-lab-engineering-report-1','software_version':__version__,
         'provenance':recording.metadata,'configuration':analysis.configuration,
         'measurement_coverage':{'observations':len(rows),
             'normalized_signals':{key:sum(row.values.get(key) is not None for row in rows) for key in recording.signals},

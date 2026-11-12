@@ -1,0 +1,11 @@
+VERSION "VCAN-authored synthetic example, not an OEM vehicle DBC"
+NS_ :
+BS_:
+BU_: SyntheticECU Logger
+BO_ 288 Drive: 8 SyntheticECU
+ SG_ VehicleSpeed : 0|16@1+ (0.1,0) [0|250] "km/h" Logger
+ SG_ EngineSpeed : 23|16@0+ (0.25,0) [0|16000] "rpm" Logger
+ SG_ Temperature : 32|8@1- (1,-40) [-168|87] "degC" Logger
+BO_ 289 Electrical: 8 SyntheticECU
+ SG_ PackVoltage : 0|16@1+ (0.1,0) [0|1000] "V" Logger
+ SG_ PackCurrent : 16|16@1- (0.1,0) [-1000|1000] "A" Logger

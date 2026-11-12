@@ -28,7 +28,7 @@ def anchors(path):
 
 
 def main():
-    documents = [ROOT / 'README.md', *sorted((ROOT / 'docs').rglob('*.md'))]
+    documents = [ROOT / 'README.md', *sorted((ROOT / 'docs').rglob('*.md')), ROOT / 'data/README.md']
     errors = []
     folded = {}
     checked = 0

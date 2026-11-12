@@ -23,7 +23,8 @@ possible recording sessions. A local dashboard and command-line tools expose the
 same analysis without requiring an AI service or cloud account. The project
 emphasises traceable evidence and uncertainty: it distinguishes measurement
 anomalies from battery defects and inferred metadata from verified definitions.
-Independent real-vehicle CAN/DBC validation is the next milestone; intelligent
+A configurable raw-CAN Recording adapter is implemented and synthetic-fixture validated.
+Independent real-vehicle CAN/DBC validation remains **blocked**; intelligent
 investigation and connected telemetry remain planned extensions.
 
 ## Current capabilities
@@ -36,9 +37,14 @@ investigation and connected telemetry remain planned extensions.
 | Quality and engineering analysis | Independent physical/metadata/time/missingness screening; candidate states, signed power/energy, cell spreads and possible sessions |
 | Delivery | Streamlit, recorded-data replay, JSON/CSV interchange and JSON/Markdown/feature-CSV engineering reports |
 
-Rules and thresholds are screening heuristics, not a validated general-purpose
-anomaly detector. Raw CAN decoding does **not** yet feed the full workbook-style
-engineering-report pipeline automatically; the current paths are distinct.
+The **v0.4 foundation (0.4.0.dev0)** adds configurable classical candump/DBC decoding,
+frame-to-signal provenance, an explicit sparse Recording adapter, bounded CLI/UI
+investigation, manual synthetic reference checks and requested JSON/Markdown reports
+with reproducibility manifests. It reuses existing engineering tools without
+cross-frame alignment. **Validated with synthetic fixtures; public real-CAN and
+independent physical validation are BLOCKED.** Three reviewed candidate sources
+and the next acquisition requirements are in the [raw CAN guide](docs/raw_can_validation.md).
+Rules and thresholds remain screening heuristics, not a validated anomaly detector.
 
 ## Engineering architecture
 
@@ -54,7 +60,8 @@ flowchart LR
   X[Decoded Excel + explicit profile] --> R[Recording + quality]
   R --> E[Deterministic engineering analysis]
   E --> P[Dashboard / replay / reports]
-  T -. v0.4 adapter and independent validation .-> R
+  RAW[Classical candump + explicit matching DBC] --> AD[Bounded v0.4 decoder + provenance]
+  AD --> R
   A[Planned diagnostic agent] -. tool orchestration .-> E
   G[Optional future gateway / remote platform] -. future ingestion adapter .-> R
   classDef planned fill:#f5f5f5,stroke:#777,stroke-dasharray:5 5;
@@ -71,12 +78,13 @@ The company names below describe engineering inspirations, **not affiliation,
 collaboration, endorsement, or official employer projects**. Status and acceptance
 boundaries are detailed in [Workflows](docs/WORKFLOWS.md).
 
-**A — CAN log analysis (Marquardt-inspired): partially implemented, synthetic scope**
+**A — CAN log analysis (Marquardt-inspired): implemented foundation, synthetic validation**
 
 ```mermaid
 flowchart LR
-  A[Supported synthetic candump] --> B[DBC decode] --> C[Signal quality + telemetry export]
-  C -. real recording / DBC validation and mapping .-> D[Engineering / anomaly report]
+  A[Classical candump + DBC] --> B[Bounded decode + frame trace] --> C[Sparse Recording + quality]
+  C --> D[Existing engineering / reports]
+  D -. real capture and independent evidence gate .-> V[Blocked real-vehicle validation]
 ```
 
 **B — Intelligent diagnostic investigation (Bosch Rexroth-inspired): planned orchestration**
@@ -121,19 +129,18 @@ are in the [dataset guide](docs/real_world_telemetry.md) and [validation record]
 | Version | Status | Milestone |
 | --- | --- | --- |
 | v0.3 | Implemented foundation | Synthetic CAN, decoded EV telemetry, deterministic diagnostics, UI/reports |
-| v0.4 | **Next priority** | Independently validate a licensed raw recording and matching DBC |
+| v0.4 | Synthetic-validated foundation; real-data gate blocked | Raw decoder/Recording adapter, provenance, bounded investigation; independent matching-capture validation outstanding |
 | v0.5 | Planned | Evaluated event/anomaly detection, including message timing |
 | v0.6 | Planned | Forecasting baselines and chronological held-out evaluation |
 | v0.7 | Planned | Read-only, evidence-based AI tool orchestration with human review |
 | v0.8 | Optional research | Buffered gateway, secure transport and remote telemetry prototype |
 
 [Roadmap acceptance criteria](docs/ROADMAP.md) define what would justify each claim.
-This restructuring milestone implements none of v0.4–v0.8.
+v0.4 is a foundation/pre-release, not a completed real-data milestone; v0.5–v0.8 remain planned.
 
 ## Validation and testing
 
-**215 automated tests passed** in this architecture revision, retaining all 211
-v0.3 tests. Coverage includes independent synthetic CAN vectors, virtual transport,
+**263 automated tests passed** in this revision, retaining all 215 baseline tests. Coverage includes independent synthetic CAN vectors, virtual transport,
 imports, uncertainty, engineering calculations, replay, exports and dashboard
 integration. The latest executed environment/platform checks are recorded in
 [docs/validation.md](docs/validation.md); historical SCUT results are kept separate
@@ -143,19 +150,19 @@ requires no AI service, internet connection, cloud platform or private dataset.
 ## Quick start
 
 Requires Git and **Python 3.12**. This revision is on
-`refactor/engineering-architecture-roadmap`; the validated v0.3 branch is preserved.
+`dev/v0.4-real-can-validation`; the validated v0.3 branch is preserved.
 The version lock includes Streamlit and Excel/test dependencies. It was produced
 for Python 3.12 on Linux; it is not an artifact-hash or native-Windows validation claim.
 
 **Windows PowerShell:** use a short writable path, for example
-`C:\Projects\CAN-Lab-v0.3`. These Windows commands are provided and reviewed, but
+`C:\Projects\CAN-Lab-v0.4`. These Windows commands are provided and reviewed, but
 native Windows execution was not available in the Linux verification environment.
 No virtual-environment activation or execution-policy change is required.
 
 ```powershell
 New-Item -ItemType Directory -Force C:\Projects | Out-Null
-git clone --branch refactor/engineering-architecture-roadmap https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git C:\Projects\CAN-Lab-v0.3
-Set-Location C:\Projects\CAN-Lab-v0.3
+git clone --branch dev/v0.4-real-can-validation https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git C:\Projects\CAN-Lab-v0.4
+Set-Location C:\Projects\CAN-Lab-v0.4
 py -3.12 -m venv .venv
 & .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 & .\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
@@ -191,6 +198,21 @@ The demo uses two virtual bus instances in one process; it is not physical CAN.
 The [engineering guide](docs/engineering_v0.3.md#reproduce) covers reports and
 Linux SocketCAN details remain in [Workflows](docs/WORKFLOWS.md#local-can-reproduction).
 
+## Raw CAN and storage reproduction
+
+After installation, follow the [complete tiny-fixture investigation](docs/raw_can_validation.md#dataset-free-reproducible-example)
+or select **Raw CAN Investigation (v0.4 foundation)** in the dashboard. No research
+capture download is required. Reports and intermediate Recording exports are opt-in.
+Keep original captures outside Git using `VCAN_DATA_DIR`; reviewed small manifests
+belong in [data/](data/README.md). Inspect storage without deleting anything:
+
+```bash
+python -m can_lab.cli storage-audit --repository-root . --output-root outputs
+```
+
+The [artifact guide](docs/data_artifacts.md) defines source/generated/evidence
+retention, safe output paths, backup responsibilities and resource bounds.
+
 ## Engineering documentation
 
 | Document | Purpose |
@@ -211,7 +233,8 @@ are described in the [engineering guide](docs/engineering_v0.3.md#dashboard-desc
 no screenshot or visual demonstration is fabricated.
 
 Physical CAN hardware and independent real-vehicle recording/DBC validation remain
-outstanding. The current codec covers the synthetic classical-CAN protocol only:
+outstanding. The original codec retains its synthetic protocol; the configurable investigation
+path supports standard-ID classical integer DBC signals only:
 no CAN FD, Automotive Ethernet, general OEM decoder, forecasting model, AI agent,
 automated root-cause system, connected gateway or cloud backend is claimed.
 Screening findings are not confirmed faults or SOH estimates. A future agent would

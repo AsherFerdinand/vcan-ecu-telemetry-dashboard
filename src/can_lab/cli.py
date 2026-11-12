@@ -64,6 +64,28 @@ def main(argv=None):
         workbook.add_argument('--sheet')
         workbook.add_argument('--max-rows', type=positive_int, default=250000)
         workbook.add_argument('--output-prefix', type=Path, required=True)
+    raw = commands.add_parser('investigate-can', help='bounded classical candump + explicit DBC investigation')
+    raw.add_argument('input', type=Path)
+    raw.add_argument('--dbc', type=Path, required=True)
+    raw.add_argument('--mapping', type=Path)
+    raw.add_argument('--references', type=Path)
+    raw.add_argument('--provenance', type=Path)
+    raw.add_argument('--source-metadata', type=Path)
+    raw.add_argument('--dbc-metadata', type=Path)
+    raw.add_argument('--time-basis', choices=['relative','unix'], required=True)
+    raw.add_argument('--max-frames', type=positive_int, default=10000)
+    raw.add_argument('--preview-frames', type=positive_int, default=100)
+    raw.add_argument('--max-source-bytes', type=positive_int, default=128*1024*1024)
+    raw.add_argument('--channel')
+    raw.add_argument('--start-s', type=float)
+    raw.add_argument('--end-s', type=float)
+    raw.add_argument('--output-prefix', type=Path)
+    raw.add_argument('--output-root', type=Path, default=Path('outputs'))
+    raw.add_argument('--include-recording', action='store_true')
+    raw.add_argument('--engineering-report', action='store_true')
+    audit = commands.add_parser('storage-audit', help='read-only tracked/source and generated-output inventory')
+    audit.add_argument('--repository-root', type=Path, default=Path.cwd())
+    audit.add_argument('--output-root', type=Path)
     for name in ('simulate', 'receive'):
         command = commands.add_parser(name)
         command.add_argument('--interface', default='socketcan', choices=['socketcan'])
@@ -75,6 +97,13 @@ def main(argv=None):
             command.add_argument('--output', type=Path)
     args = parser.parse_args(argv)
     try:
+        if args.command == 'investigate-can':
+            from .can_cli import run
+            return run(args)
+        if args.command == 'storage-audit':
+            from .artifacts import audit_storage
+            print(json.dumps(audit_storage(args.repository_root,output_root=args.output_root),indent=2))
+            return 0
         if args.command in ('analyze-xlsx', 'report-xlsx'):
             from .workbook_cli import analyze
             return analyze(args)

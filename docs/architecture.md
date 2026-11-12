@@ -39,7 +39,7 @@ the planned detector/investigation stages already operate.
 | Layer | Implemented responsibility and modules | Boundary / future work |
 | --- | --- | --- |
 | 1. Data acquisition | `simulator.py`, `receiver.py`, `io.py`, `excel.py`; sources are virtual frames, supported logs, canonical tables and decoded workbooks | Source files remain unchanged. No connected gateway or general live-hardware acquisition service |
-| 2. CAN communication and decoding | `cli.py` owns bus lifetime; `codec.SyntheticCodec`, packaged `data/synthetic.dbc`, `io.load_candump` | Classical standard-ID synthetic protocol only; real matching-DBC validation and extra formats are v0.4 work |
+| 2. CAN communication and decoding | `cli.py` owns bus lifetime; `codec.SyntheticCodec`, packaged `data/synthetic.dbc`, `io.load_candump`, `can_recording` | Synthetic codec preserved; configurable standard-ID classical DBC investigation is synthetic-validated; real matching-capture validation blocked |
 | 3. Normalisation and quality | `telemetry.py`, `recording.py`, `excel.TimestampParser`, `quality.py`, `recording_review.py` | Units, raw cells, clock interpretation, provenance and independent quality dimensions; no guessed metadata or automatic repairs |
 | 4. Engineering analytics | `diagnostics.py`, `engineering_common.py`, `operating.py`, `energy.py`, `cells.py`, `engineering.py` | Deterministic calculations and candidate/heuristic findings; evaluated anomaly detection and forecasting remain planned |
 | 5. Diagnostic automation | `pipeline.prepare_workbook` plus existing analysis/report Python functions, coordinated by CLI/UI | Current deterministic orchestration only. No question-answering agent, historical investigation store or automated root-cause system |
@@ -52,8 +52,9 @@ source. Already-decoded telemetry bypasses CAN decoding entirely.
 
 ## Actual dependency map
 
-Solid edges below represent existing imports/calls. CAN and decoded-workbook
-paths are separate. Dotted links are designs that do not currently execute.
+Solid edges below represent existing imports/calls. The v0.4 configurable
+investigation now bridges raw frames into Recording without altering the original
+synthetic or workbook importers. Dotted links are designs that do not currently execute.
 
 ```mermaid
 flowchart TB
@@ -95,7 +96,9 @@ flowchart TB
   RIO[recorded_io] --> Q
   UI --> REPORT
   CLI --> REPORT
-  V04[Planned raw-frame provenance / Recording adapter] -.-> R
+  V04[can_recording: explicit DBC + bounded raw frames] --> R
+  CLI --> V04
+  UI --> V04
   AGENT[Planned agent orchestration] -.-> P
   AGENT -.-> E
   CLOUD[Optional connected telemetry] -.-> V04
@@ -128,15 +131,18 @@ discontinuity-safe plot data without importing Streamlit.
 
 ## Source contracts and known integration gaps
 
-**Raw frames:** the current codec accepts only the original two synthetic,
-classical standard-ID messages. `load_candump` parses `candump -L`, validates
-frames, then returns sparse v1 samples. Unknown identifiers, malformed lengths,
-CAN FD, RTR/error/extended frames and mixed channels are rejected, not silently
-decoded or advertised as supported. The source log retains identifiers/payloads,
-but v1 exported samples do **not** contain a complete raw-frame archive, channel
-history or source-line back-reference. Keep the original log. A richer traceable
-frame-to-signal recording contract is an explicit v0.4 acceptance requirement;
-this milestone does not implement it or pretend current reports provide it.
+**Raw frames:** the original SyntheticCodec / `io.load_candump` v1 path is
+unchanged. New `can_recording.investigate_candump` uses strict configurable DBC,
+bounded classical standard-ID parsing and explicit exact-unit mapping. A global
+frame table retains raw payloads, timestamps, line/index/offset, decoded signals
+and shared DBC definitions. Each decoded frame becomes one sparse Recording
+observation referencing that table. There is no cross-frame simultaneity assumption
+or temporal alignment; missing battery signals stay missing. CAN reports and
+engineering exports reuse the existing models/functions. `can_cli`, `can_dashboard`,
+`can_reports` and `artifacts` provide local delivery and provenance. No network
+acquisition dependency is added. Protocol limits and evidence status are in the
+[raw CAN guide](raw_can_validation.md). Real-vehicle compatibility/physical validation
+remain blocked, despite the synthetic-validated adapter being implemented.
 
 **Decoded sources:** canonical CSV/JSON use explicit names/profiles and strict v1
 validation. Workbook `Recording` retains original cells, source columns, original
@@ -145,7 +151,8 @@ normalised signals and quality annotations; the workbook path never invents CAN
 identifiers. The bridge to v1 omits cell-extrema/metadata fields that v1 cannot
 represent, and rejects incompatible timestamps. Use recording exports for that
 full-fidelity representation. There is no automatic reverse v1-to-Recording
-adapter and no end-to-end raw-vehicle-CAN engineering report yet.
+adapter. The explicit raw-frame adapter is independently callable; its real-vehicle
+validation remains outstanding.
 
 **Uncertainty:** physical screening, metadata verification, timestamp validity
 and missingness remain independent and may overlap. Yearless `MDDHHMMSS` is an

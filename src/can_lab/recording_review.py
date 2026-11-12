@@ -34,7 +34,8 @@ def timestamp_classification(row):
 
 
 def dimensions(row, recording):
-    numeric_values = [numeric(row.raw.get(column)) for column in COLUMNS if column != 'charging_signal']
+    columns=list(COLUMNS)+(['engine_rpm'] if 'rpm' in recording.signals else [])
+    numeric_values = [numeric(row.raw.get(column)) for column in columns if column != 'charging_signal']
     present_numeric = any(value is not None for value in numeric_values)
     physical = any(physical_issues(row, signal) for signal in recording.signals)
     missing = any(issue['status'] == 'MISSING' for issues in row.quality.values() for issue in issues)
@@ -59,7 +60,9 @@ def dimension_summary(recording):
             if key != 'timestamp' and value:
                 counts[key + '_observations'] += 1
         counts['timestamp_' + view['timestamp'] + '_observations'] += 1
-        for column, (signal, _) in COLUMNS.items():
+        sources=[(column,signal) for column,(signal,_) in COLUMNS.items()]
+        if 'rpm' in recording.signals:sources.append(('engine_rpm','rpm'))
+        for column, signal in sources:
             issues = row.quality.get(signal, [])
             if any(i['status'] == 'MISSING' for i in issues):
                 per_signal[signal]['missing'] += 1

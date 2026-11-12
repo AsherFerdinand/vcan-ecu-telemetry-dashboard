@@ -7,7 +7,7 @@ behaviour. Company inspirations in [Workflows](WORKFLOWS.md) are not affiliation
 | Milestone | Status | Evidence gate |
 | --- | --- | --- |
 | v0.3 | Implemented foundation | Reproducible synthetic CAN and decoded-telemetry checks |
-| v0.4 | **Next priority** | Independent real-recording / matching-DBC validation |
+| v0.4 | Implemented foundation, synthetic-validated; real-data gate blocked | Independent real-recording / matching-DBC validation |
 | v0.5 | Planned | Measured event/anomaly detection performance |
 | v0.6 | Planned | Chronological held-out forecasting evaluation |
 | v0.7 | Planned | Logged, human-reviewed AI tool orchestration compared with scripted automation |
@@ -30,8 +30,12 @@ being advertised as natively tested.
 
 ## v0.4 — Real CAN recording validation
 
-**Next priority.** Validate raw frames through physical signals and traceable
-engineering output using appropriately licensed public data.
+**Foundation implemented and validated with synthetic fixtures. Real-data gate BLOCKED.**
+The configurable decoder, raw-frame provenance, sparse Recording adapter, bounded
+CLI/dashboard and opt-in reports/manifests now operate. Three source assessments
+did not establish a qualifying independently referenced real capture/DBC pair; see
+[raw CAN validation](raw_can_validation.md). The following acceptance criteria
+remain the gate for claiming complete real-data validation.
 
 Acceptance criteria:
 
@@ -54,7 +58,8 @@ Acceptance criteria:
 
 Physical bus testing is a separate evidence claim and requires a documented
 interface/host setup; a successful offline decode alone is not hardware validation.
-No dataset acquisition or v0.4 adapter is implemented in this milestone.
+No real dataset is selected or acquired automatically. The implemented adapter
+is not evidence of independent vehicle accuracy.
 
 ## v0.5 — Automated event and anomaly detection
 
@@ -111,7 +116,7 @@ no implied CAN FD/Ethernet/cloud support from a conceptual diagram.
 
 ## Scope and progression
 
-No v0.4–v0.8 functionality is implemented as part of this restructuring. Keep
+The v0.4 foundation is implemented; its real-data gate and v0.5–v0.8 remain outstanding. Keep
 experimental models/agents/transport optional and separately evaluated. A claimed
 milestone needs its evidence gate, reproducibility instructions and limitations,
 not just a diagram, function name, library import or attractive dashboard.

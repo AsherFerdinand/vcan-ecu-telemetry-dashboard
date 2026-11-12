@@ -1,0 +1,47 @@
+{
+  "evidence_kind": "synthetic_manual_vectors",
+  "dbc_sha256": "718a1cba4f69bc50abbfe95769c0645cd32000d5f0c2b214ad69a3f7d05eac2b",
+  "source": "VCAN-authored synthetic byte arithmetic documented in docs/raw_can_validation.md; not measured vehicle accuracy",
+  "vectors": [
+    {
+      "frame_id": 288,
+      "payload_hex": "D3021F4023000000",
+      "signal": "VehicleSpeed",
+      "expected": 72.3,
+      "unit": "km/h",
+      "absolute_tolerance": 1e-10
+    },
+    {
+      "frame_id": 288,
+      "payload_hex": "D3021F4023000000",
+      "signal": "EngineSpeed",
+      "expected": 2000,
+      "unit": "rpm",
+      "absolute_tolerance": 0
+    },
+    {
+      "frame_id": 288,
+      "payload_hex": "D3021F4023000000",
+      "signal": "Temperature",
+      "expected": -5,
+      "unit": "degC",
+      "absolute_tolerance": 0
+    },
+    {
+      "frame_id": 289,
+      "payload_hex": "A00F06FF00000000",
+      "signal": "PackVoltage",
+      "expected": 400,
+      "unit": "V",
+      "absolute_tolerance": 1e-10
+    },
+    {
+      "frame_id": 289,
+      "payload_hex": "A00F06FF00000000",
+      "signal": "PackCurrent",
+      "expected": -25,
+      "unit": "A",
+      "absolute_tolerance": 1e-10
+    }
+  ]
+}

@@ -4,13 +4,18 @@ import pandas as pd
 import streamlit as st
 from can_lab.io import load_csv, load_json, load_candump, export_csv, export_json
 from can_lab.telemetry import SIGNALS
+from can_lab import __version__
 
 st.set_page_config(page_title='Automotive Telemetry Lab', layout='wide')
 st.title('Automotive CAN & Telemetry Laboratory')
-st.caption('Virtual ECU & CAN Lab v0.3 — Automotive Telemetry, Diagnostics & Test Automation')
+st.caption(f'VCAN {__version__} — Automotive Telemetry, Diagnostics & Test Automation')
 st.caption('Sparse observations in canonical units. No interpolation or forward filling. '
            'Synthetic CAN definitions are not vehicle-specific definitions.')
-source = st.selectbox('Data Source', ['Virtual ECU Simulation', 'Imported CAN Log', 'Real-World EV Dataset'], key='data_source')
+source = st.selectbox('Data Source', ['Virtual ECU Simulation', 'Imported CAN Log', 'Real-World EV Dataset', 'Raw CAN Investigation (v0.4 foundation)'], key='data_source')
+if source == 'Raw CAN Investigation (v0.4 foundation)':
+    from can_lab.can_dashboard import render_raw_can
+    render_raw_can()
+    st.stop()
 if source == 'Real-World EV Dataset':
     from can_lab.recorded_dashboard import render_real_world
     render_real_world()

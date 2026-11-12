@@ -139,7 +139,7 @@ class Recording:
 
     @property
     def signals(self):
-        return list(CANONICAL_UNITS)
+        return list(CANONICAL_UNITS) + (['rpm'] if 'rpm' in self.metadata.get('additional_signals', []) else [])
 
     def duration_s(self):
         times = [row.timestamp_s for row in self.observations]
@@ -160,7 +160,7 @@ class Recording:
             if row.timestamp_s is None or row.timestamp_s < 0:
                 raise ValueError('canonical v1 export requires valid timestamps for every observation')
             values = {key: row.values.get(key) for key in
-                      ('speed_kmh', 'odometer_km', 'battery_voltage_v', 'soc_pct')}
+                      ('speed_kmh', 'rpm', 'odometer_km', 'battery_voltage_v', 'soc_pct')}
             current = row.values.get('battery_current_measured_a')
             if convention != 'unknown' and current is not None:
                 values['battery_current_a'] = -current if convention == 'positive_charge' else current

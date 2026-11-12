@@ -30,3 +30,27 @@ class SyntheticCodec:
         values = definition.decode(message.data, decode_choices=False)
         return TelemetrySample(timestamp_s=message.timestamp, time_basis=time_basis,
                                source=source, **values)
+
+
+def load_classical_dbc(text):
+    """Load a strict, standard-ID classical integer-signal DBC for offline review.
+
+    Existing SyntheticCodec is unchanged. This deliberately rejects untested
+    extended/FD/multiplexed/float signal definitions instead of implying support.
+    """
+    try:
+        database = cantools.database.load_string(text, database_format='dbc', strict=True)
+    except Exception as error:
+        raise ValueError(f'invalid DBC: {error}') from error
+    if not database.messages:
+        raise ValueError('DBC contains no messages')
+    if len({message.frame_id for message in database.messages})!=len(database.messages):
+        raise ValueError('duplicate DBC message identifiers are ambiguous')
+    for message in database.messages:
+        if len({s.name for s in message.signals})!=len(message.signals):
+            raise ValueError('duplicate DBC signal names are ambiguous')
+        if message.is_extended_frame or message.is_fd or message.length > 8:
+            raise ValueError('only standard-ID classical CAN DBC messages are supported')
+        if any(s.is_multiplexer or s.multiplexer_signal is not None or s.is_float for s in message.signals):
+            raise ValueError('multiplexed and floating-point CAN signals are not supported')
+    return database

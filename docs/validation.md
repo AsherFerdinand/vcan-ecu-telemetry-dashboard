@@ -436,3 +436,59 @@ No AI, forecasting, root-cause or gateway/cloud functionality is claimed.
 The full real dataset, generated outputs, `.venv`, caches and temporary link probe
 are excluded from the commit. Publication is limited to the new refactoring branch,
 with no automatic merge or changes to validated branch refs.
+
+## v0.4 foundation — current execution
+
+Starting point: architecture commit `d8aa5fdef334050bf1ddab24e10c8a872f2ec33b`.
+Development branch: `dev/v0.4-real-can-validation`; package `0.4.0.dev0`.
+**Implemented, synthetic-fixture validated; public real-CAN validation BLOCKED.**
+The historical v0.3/SCUT results above are retained and were not rerun or promoted
+to raw-CAN evidence in this task. The original synthetic codec remains unchanged;
+the new configurable decoder has an explicit provenance-rich Recording adapter.
+
+Three public source candidates and their pinned revisions were assessed in
+[raw CAN validation](raw_can_validation.md). None established a selected permitted
+capture + matching DBC + independent physical references. No real-vehicle accuracy,
+hardware CAN validation or completed v0.4 release is claimed. Required next evidence:
+vehicle/software/bus compatibility, timestamp basis, capture redistribution terms,
+exact DBC revision, and independently sourced values/tolerances.
+
+The authored fixture verifies little/big endian, signed extraction, scaling,
+offset and units with five manually calculated expected values. All five passed;
+7 scanned records produced 4 decoded frames, 1 unknown ID, 1 wrong DLC and
+1 malformed record. Raw timestamp text and frame line/index/byte offsets survive;
+JSON/CSV Recording round trips preserve the shared frame table and optional RPM.
+One electrical frame gives −10 kW signed measured power; no accepted battery-energy
+intervals exist. Equal timestamps across separate V/I frames do not create power.
+The independent physical accuracy status remains `not_established`.
+
+Regression coverage adds strict DBC/protocol rejection, malformed input counters,
+unknown IDs, exact hash checking before decode, metadata/path protection, filtering,
+clean byte/line-limit failure, a 20,000-line generated input with retention capped
+at 10 frames, deterministic reports, no-overwrite output policy, read-only audit
+and dataset-free Streamlit investigation/engineering/download preparation. Default
+tests make no research download. Baseline virtual bus, synthetic DBC, replay,
+workbook quality, engineering and export tests remain in the suite.
+
+### Storage evidence and retention
+
+Before changes: 63 tracked files / 334,930 content bytes; ignored outputs:
+16 files / 340,771 bytes. After the explicitly requested full example run:
+21 output files / 400,616 bytes (five new artifacts, 59,845 bytes). Largest outputs
+were `phase2-synthetic.json` 82,205; `demo.json` 78,948;
+`phase2-synthetic.csv` 72,121; historical architecture feature CSV 54,569;
+new CAN engineering JSON 26,168 bytes. Source audit measures working tracked-file
+content, not compressed `.git`, ignored environments or all filesystem usage.
+The existing repo `.venv` occupies approximately 493 MB; it was not copied/deleted.
+Small research probes stayed outside the checkout (one SavvyCAN log 489,938 bytes,
+DBCs 274,509 and 2,001 bytes). No full research corpus, redundant dataset copy,
+phase ZIP or model artifact was produced or committed. No cleanup was performed.
+
+Ignore checks cover raw logs/CSV/workbooks/archives, outputs and environments;
+tiny authored fixture exceptions are explicit. New source manifests/configuration
+are permanent; run reports are ignored generated artifacts. Existing historical
+reports, original workbooks and any independent acquisitions require separate
+owner-managed backup, identified by SHA-256. They were not removed. See
+[retention policy](data_artifacts.md). Final tracked/output inventory is available
+through the read-only `storage-audit` command at the pushed revision; clean-source
+example reports are opt-in and not part of Git.

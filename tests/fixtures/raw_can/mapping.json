@@ -1,0 +1,6 @@
+[
+  {"frame_id": 288, "signal": "VehicleSpeed", "target": "speed_kmh"},
+  {"frame_id": 288, "signal": "EngineSpeed", "target": "rpm"},
+  {"frame_id": 289, "signal": "PackVoltage", "target": "battery_voltage_v"},
+  {"frame_id": 289, "signal": "PackCurrent", "target": "battery_current_measured_a"}
+]

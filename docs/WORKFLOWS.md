@@ -3,7 +3,8 @@
 These are engineering problem statements inspired by the named industries and
 roles, not claims of affiliation, collaboration or endorsement by Marquardt,
 Bosch Rexroth or Porsche. Implemented v0.3 capabilities are separated from planned
-work. No v0.4–v0.8 feature is implemented by the architecture milestone.
+work. The v0.4 foundation is synthetic-validated; independent real-CAN validation
+is blocked and v0.5–v0.8 remain planned.
 
 ## A. Automated CAN log analysis — Marquardt-inspired
 
@@ -29,7 +30,13 @@ flowchart LR
 | Time | Source timestamps preserved in v1 samples; ordering/basis validation, not multi-clock synchronisation |
 | Quality | Strict frame checks and deterministic signal plausibility; unknown IDs fail explicitly |
 | Export | Canonical telemetry JSON/CSV; raw identifiers/payloads remain in the original log, not a complete exported frame archive |
-| Events / engineering report | Rich deterministic engineering reports exist for decoded workbooks; the automatic raw-CAN-to-Recording adapter and independently validated end-to-end path remain absent |
+| Events / engineering report | Rich deterministic engineering reports exist for decoded workbooks; the new explicit raw-CAN-to-Recording adapter supports these tools, but independently validated real-vehicle evidence remains absent |
+
+The original synthetic workflow below remains unchanged. The separate configurable
+v0.4 investigation supports explicit DBC mapping, coverage counters, frame-table
+provenance and sparse Recording/engineering exports, with no alignment. Follow the
+[raw CAN guide](raw_can_validation.md) for the complete fixture workflow and exact
+protocol/evidence limits. The table above describes the original synthetic path.
 
 ### Local CAN reproduction
 
