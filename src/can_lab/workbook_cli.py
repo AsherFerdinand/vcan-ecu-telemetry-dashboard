@@ -1,8 +1,7 @@
 """CLI adapter for decoded workbook analysis. No CAN transport is involved."""
 import json
-from .diagnostics import calculate_power
-from .excel import load_xlsx
-from .quality import QualityConfig, validate_recording, quality_summary
+from .quality import QualityConfig, quality_summary
+from .pipeline import prepare_workbook
 from .recorded_io import export_recording_json, export_annotated_csv, export_diagnostic_summary
 from .recording import DatasetProfile
 from .engineering import EngineeringConfig, analyze_engineering
@@ -26,9 +25,8 @@ def analyze(args):
         engineering_outputs.append((args.output_prefix.with_name(args.output_prefix.name+'.features.csv'),export_engineering_csv))
     if any(path.exists() for path, _ in outputs + engineering_outputs):
         raise ValueError('an analysis output already exists; choose a new output prefix')
-    recording = load_xlsx(args.input, profile=profile, sheet=args.sheet, max_rows=args.max_rows)
-    validate_recording(recording, config)
-    calculate_power(recording)
+    recording = prepare_workbook(args.input, profile=profile, quality_config=config,
+                                 sheet=args.sheet, max_rows=args.max_rows)
     analysis = analyze_engineering(recording,engineering_config)
     args.output_prefix.parent.mkdir(parents=True, exist_ok=True)
     for path, exporter in outputs:

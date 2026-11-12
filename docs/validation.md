@@ -339,3 +339,100 @@ Unresolved evidence remains: authoritative timestamp encoding/year/timezone,
 current polarity, SOC scaling, odometer details, sensor sentinel/calibration
 semantics, actual trip identifiers, vehicle-specific thresholds and dataset
 redistribution/citation terms. Hardware/native CAN validation is not claimed.
+
+# Architecture and portfolio revision — 2026-11-12
+
+Reviewed foundation: v0.3.0 commit
+`792b0df6172d2bef73e27d941dc588ba2ba5268d` on
+`dev/phase2-ev-telemetry`. Work takes place on the dedicated
+`refactor/engineering-architecture-roadmap` branch. The validated branch and
+`main` are preserved; numerical algorithms, defaults, data schemas and package
+version are unchanged. No v0.4–v0.8 functionality is added.
+
+## Change and architectural evidence
+
+The dependency review found the engineering core already independent of
+Streamlit/CAN tools. No package-wide reorganisation was justified. The one source
+refactor extracts duplicated workbook loading, validation and signed-power
+preparation into `pipeline.prepare_workbook`, now called by CLI and dashboard.
+Four new tests check raw-byte/stream-position/provenance preservation, known
+signed power, conservative unknown-unit/time defaults, forwarding of source
+selection/limits and dependency activation. All previous 211 tests remain.
+
+`docs/architecture.md` retains its original spelling and schema anchors to avoid
+a case-only `ARCHITECTURE.md` conflict on Windows. It adds six-layer and module
+maps and explicit integration gaps. `WORKFLOWS.md` separates three industry-inspired
+problems from affiliations/implemented features. `ROADMAP.md` gives v0.3–v0.8
+acceptance gates. The README is an overview with a 128-word project introduction,
+status-aware Mermaid diagrams, scoped capabilities and short-path Windows setup.
+Numerical/dataset detail remains in the existing technical documents.
+
+## Executed checks
+
+- **215 tests passed**, no skips, in the existing development environment.
+- A new `.venv` was created with **Python 3.12.14 on Linux**, using the README's
+  pinned dependency installation, editable install and `pip check` commands.
+  **215 tests passed**, no skips, in that fresh environment as well.
+- The clean environment's documented module CLI ran the virtual ECU demo:
+  **20 decoded observations, zero flags**. Independent synthetic byte-vector
+  and transport tests remained in the full suite.
+- Canonical CSV/JSON and supported synthetic candump CLI imports succeeded.
+- A generated, clearly synthetic 60-row workbook produced engineering JSON,
+  Markdown and a 60-row feature CSV through the headless CLI workflow.
+- The clean environment launched Streamlit using the README command options.
+  HTTP health returned `200 ok` and root HTML was served without a workbook;
+  the validation process was stopped afterward. Existing Streamlit/replay tests
+  exercise the shared preparation service through the unchanged application UI.
+- `tools/check_docs.py` verified **35 local file/heading links across nine
+  Markdown documents** and no case-only document collisions. A temporary broken
+  link was deliberately rejected and then removed. CI now runs this check.
+  External URLs, Shields.io rendering and Mermaid rendering are not covered by
+  this local link check; diagrams were source-reviewed.
+- `git diff --check` passed. No formatter/linter configuration is present.
+
+## Full public workbook through the shared service
+
+The pinned SCUT public archive was retrieved outside the checkout for this rerun.
+Workbook SHA-256 matched the prior validation exactly:
+`3d0f39c947ecb08867e01e49dfe83995552a5f9fb69580910ea71f8be12e34b3`.
+
+`prepare_workbook` with the reviewed source profile and 10-second expected cadence,
+followed by the existing engineering function, reproduced:
+
+| Check | Result |
+| --- | ---: |
+| Observations | 81,898 |
+| Inferred recording span | 2,575,705 s |
+| Possible sessions | 700 |
+| Included / excluded energy intervals | 79,973 / 1,924 |
+| Signed net over accepted intervals | -56.68855195833805 kWh |
+| Invalid timestamp values/clocks | 0 |
+| Minimum-temperature raw -40 values | 6 |
+| Zero minimum-cell-voltage values | 136 |
+
+Engineering JSON/Markdown exports succeeded. The rerun took approximately 17.9 s
+in this environment; this is an observed runtime, not a performance guarantee.
+The workbook and generated reports stayed outside Git. Earlier full-workbook
+replay and edge-case interchange evidence remains in the v0.3 validation section;
+this refactor's complete suite reran replay/export regressions.
+
+## Limits and remaining work
+
+There is no native Windows, PowerShell executable or macOS host in this execution
+environment. **Windows PowerShell instructions were reviewed but not natively
+executed**; Linux equivalents were executed. The version lock was produced for
+Python 3.12/Linux, so native Windows installation/runtime must be independently
+checked before advertising Windows platform validation. No platform evidence is
+inferred from command syntax alone.
+
+Real vehicle CAN/matching-DBC and physical hardware validation remain outstanding.
+The original synthetic codec is unchanged. Source candump files retain raw frames,
+but exported v1 samples do not provide a complete frame archive/back-reference;
+that is a documented v0.4 requirement, not an implemented feature of this task.
+Timestamp encoding remains inferred; recording year/timezone, current polarity,
+SOC scale, sentinel meaning and dataset redistribution terms remain uncertain.
+No AI, forecasting, root-cause or gateway/cloud functionality is claimed.
+
+The full real dataset, generated outputs, `.venv`, caches and temporary link probe
+are excluded from the commit. Publication is limited to the new refactoring branch,
+with no automatic merge or changes to validated branch refs.

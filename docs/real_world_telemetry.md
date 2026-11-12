@@ -1,3 +1,5 @@
+> For the project-wide responsibility map and planned extensions, see [Architecture](architecture.md), [Workflows](WORKFLOWS.md) and [Roadmap](ROADMAP.md). Source/canonical contracts below remain the authoritative recording guide.
+
 > v0.3 integrates this preserved Phase 2 pipeline with operating-state, signed-energy, cell and session analysis. See [engineering_v0.3.md](engineering_v0.3.md) for the new calculations and reports.
 
 # Phase 2: decoded EV recordings, diagnostics and replay

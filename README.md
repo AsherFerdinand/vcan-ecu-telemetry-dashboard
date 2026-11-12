@@ -1,266 +1,218 @@
-# Virtual ECU & CAN Lab — Automotive Telemetry, Diagnostics & Test Automation
+# VCAN
+### Automotive Communication, Telemetry & Intelligent Diagnostics
 
-v0.3: Phase 1, Phase 2 and Phase 3 evolution of the existing Virtual CAN Bus ECU Telemetry Simulator.
-The original Git history, sine-wave ECU model, standard CAN IDs, payload layout,
-and `can_project/` entry points are preserved.
+From CAN frames to engineering insights — a modular platform for vehicle communication, measurement analysis, and automated diagnostics.
 
-## Two operating modes
+![Python](https://img.shields.io/badge/Python-3.12-3776AB)
+![python-can](https://img.shields.io/badge/CAN-python--can-555555)
+![cantools](https://img.shields.io/badge/DBC-cantools-555555)
+![pandas](https://img.shields.io/badge/Data-pandas-150458)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B)
+![pytest](https://img.shields.io/badge/Tests-pytest-0A9EDC)
 
-**Virtual CAN Laboratory** retains the original synthetic ECU model, python-can
-communication, SocketCAN workflow, verified synthetic DBC and portable virtual demo.
+## Project overview
 
-**Real-World EV Diagnostics** imports already decoded telemetry. It now adds
-candidate operating states, signed power/energy with explicit coverage, cell
-spreads and sensor-screening indicators, possible sessions and engineering reports.
-Excel measurements are never presented as authentic OEM CAN frames.
+VCAN is a Python engineering laboratory for inspecting automotive communication
+and measurement data. It addresses the practical work of decoding known CAN
+messages, normalising signals, checking data quality, investigating operating
+conditions, and producing reproducible reports. Two distinct paths support that
+work: a virtual ECU with a verified synthetic DBC, and imported, already-decoded
+vehicle telemetry with explicit source provenance. Deterministic calculations
+cover vehicle dynamics, signed battery power and energy, cell measurements, and
+possible recording sessions. A local dashboard and command-line tools expose the
+same analysis without requiring an AI service or cloud account. The project
+emphasises traceable evidence and uncertainty: it distinguishes measurement
+anomalies from battery defects and inferred metadata from verified definitions.
+Independent real-vehicle CAN/DBC validation is the next milestone; intelligent
+investigation and connected telemetry remain planned extensions.
 
-```text
-Synthetic ECU -> CAN transport -> synthetic DBC -> canonical telemetry
-Decoded recordings -> provenance + quality -> engineering analysis -> UI / reports
+## Current capabilities
+
+| Implemented foundation (v0.3) | Verified scope |
+| --- | --- |
+| Virtual ECU and CAN reception | Original synthetic RPM/speed/temperature, in-process virtual buses; Linux SocketCAN entry points retained |
+| DBC encoding/decoding and log import | Fixed synthetic protocol, classical `candump -L`; independent byte-vector tests |
+| Decoded telemetry import | Canonical CSV/JSON and profiled Excel; original cells, time, units and provenance retained for workbooks |
+| Quality and engineering analysis | Independent physical/metadata/time/missingness screening; candidate states, signed power/energy, cell spreads and possible sessions |
+| Delivery | Streamlit, recorded-data replay, JSON/CSV interchange and JSON/Markdown/feature-CSV engineering reports |
+
+Rules and thresholds are screening heuristics, not a validated general-purpose
+anomaly detector. Raw CAN decoding does **not** yet feed the full workbook-style
+engineering-report pipeline automatically; the current paths are distinct.
+
+## Engineering architecture
+
+Solid paths are implemented; dashed paths are planned or optional. The six-layer
+responsibility map and module dependency review are in [Architecture](docs/architecture.md).
+
+```mermaid
+flowchart LR
+  V[Virtual ECU / synthetic candump] --> D[Synthetic DBC decoder]
+  D --> T[TelemetrySample v1]
+  F[Canonical CSV / JSON] --> T
+  T --> O[Telemetry UI / JSON / CSV]
+  X[Decoded Excel + explicit profile] --> R[Recording + quality]
+  R --> E[Deterministic engineering analysis]
+  E --> P[Dashboard / replay / reports]
+  T -. v0.4 adapter and independent validation .-> R
+  A[Planned diagnostic agent] -. tool orchestration .-> E
+  G[Optional future gateway / remote platform] -. future ingestion adapter .-> R
+  classDef planned fill:#f5f5f5,stroke:#777,stroke-dasharray:5 5;
+  class A,G planned;
 ```
 
-The [v0.3 engineering guide](docs/engineering_v0.3.md) documents architecture,
-math, defaults, file responsibilities, dashboard views and reproduction steps.
-The [validation record](docs/validation.md) contains executed tests and full SCUT
-workbook results. No SOH/ML model, confirmed battery-defect classifier or verified
-vehicle-efficiency claim is included.
+The small shared `pipeline.prepare_workbook` service prepares decoded workbooks
+for both CLI and dashboard. Numerical modules remain independent of Streamlit.
+No agent, forecasting model, gateway or cloud component is required or implemented.
 
-## v0.3 engineering workflow
+## Core workflows
 
-With the pinned environment below installed:
+The company names below describe engineering inspirations, **not affiliation,
+collaboration, endorsement, or official employer projects**. Status and acceptance
+boundaries are detailed in [Workflows](docs/WORKFLOWS.md).
 
-```bash
-python examples/make_ev_fixture.py /tmp/synthetic-v03.xlsx
-can-lab report-xlsx /tmp/synthetic-v03.xlsx \
-  --profile /tmp/synthetic-v03.profile.json \
-  --engineering-config examples/engineering_config.json \
-  --output-prefix outputs/synthetic-v03 --include-features
+**A — CAN log analysis (Marquardt-inspired): partially implemented, synthetic scope**
+
+```mermaid
+flowchart LR
+  A[Supported synthetic candump] --> B[DBC decode] --> C[Signal quality + telemetry export]
+  C -. real recording / DBC validation and mapping .-> D[Engineering / anomaly report]
 ```
 
-Reports include provenance, measurement coverage, candidate dynamics, electrical
-relationships, signed-energy coverage, cell diagnostics, possible-session
-statistics and limitations. JSON is machine-readable, Markdown is human-readable,
-and optional CSV contains annotated engineering features. Existing recording
-exports remain available. No PDF or additional plotting dependency is required.
+**B — Intelligent diagnostic investigation (Bosch Rexroth-inspired): planned orchestration**
 
-The real-world dashboard offers Overview, Vehicle Dynamics, Battery Electrical,
-Battery Health Indicators, Session Explorer, Diagnostics, Recorded Replay, and
-source exports. Shared time/session selection controls synchronized telemetry;
-replay also shows current operating candidates, power and temperature.
+```mermaid
+flowchart LR
+  Q[Engineer question] -.-> A[Planned agent] -.-> T[Existing deterministic tools]
+  T -.-> E[Evidence / historical comparison / replay] -.-> H[Human-reviewed root-cause candidates]
+```
 
-Energy is integrated only over usable adjacent intervals within a configurable
-maximum (30 s by default), never across detected boundaries. Positive/negative
-signed components are not charging/discharging labels. Regeneration candidates
-require a dedicated current-polarity reference, not just negative current. Session
-SOC change remains in raw source units when its percentage scale is unknown.
-Distance-qualified signed kWh/km is withheld when interval coverage does not match
-and is never presented as verified efficiency. Thresholds are research screening
-heuristics, not OEM specifications.
+**C — Connected vehicle telemetry (Porsche-inspired): optional research track**
 
-## Capabilities and boundaries
+```mermaid
+flowchart LR
+  S[Sensors / ECUs] -.-> N[Vehicle network] -.-> G[Future acquisition gateway]
+  G -. timestamp + buffer + secure internet transport .-> C[Future remote storage]
+  C -.-> D[Engineering delivery]
+```
 
-| Area | Original project | Phase 1 |
+CAN is a vehicle communication network, not an internet transport. A vehicle ECU
+network does not automatically provide a gateway or cloud connection.
+
+## Real-world dataset investigation
+
+The public [SCUT EV operation dataset](https://github.com/Translab-SCUT/Electric-vehicle-operation-data)
+was reviewed at revision `f3bc3eb9132c46fc75e3e60662515dbaf7325c98`.
+Its `vehicle#1.xlsx` contains **81,898 already-decoded observations**, not raw CAN
+frames. Prior full-file checks found 700 possible sessions and 79,973 accepted /
+1,924 excluded energy intervals. `MDDHHMMSS` fits the calendar/cadence evidence,
+but remains **inferred**; the year/timezone, current polarity, SOC scale and some
+sentinel meanings remain unresolved. No real-recording/matching-DBC validation
+can be inferred from that workbook analysis.
+
+Use **Real-World EV Dataset → Use source-reviewed SCUT profile** in the dashboard.
+Metadata warnings are distinct from physical suspicion; no raw rows are deleted.
+Signed energy is over accepted intervals only, not verified efficiency. The
+workbook is not bundled; source/licensing details, signal mapping and reproduction
+are in the [dataset guide](docs/real_world_telemetry.md) and [validation record](docs/validation.md).
+
+## Development roadmap
+
+| Version | Status | Milestone |
 | --- | --- | --- |
-| ECU | Synthetic RPM, speed, battery temperature at 100 Hz | Same model and two 8-byte frames; modular generator |
-| Transport | Linux SocketCAN `vcan0` | SocketCAN retained; bounded in-process virtual-bus demo for portable development |
-| Decoding | Hardcoded byte slices | Packaged `cantools` DBC verified against independent byte vectors |
-| Data | Console output | CSV/JSON normalization and classical `candump -L` import; JSON/CSV export |
-| Validation | Manual inspection | Explicit time bases, units, optional signals, quality flags, pytest, CI |
-| Visualization | Terminal receiver | Optional Streamlit upload, plots, quality table, exports |
+| v0.3 | Implemented foundation | Synthetic CAN, decoded EV telemetry, deterministic diagnostics, UI/reports |
+| v0.4 | **Next priority** | Independently validate a licensed raw recording and matching DBC |
+| v0.5 | Planned | Evaluated event/anomaly detection, including message timing |
+| v0.6 | Planned | Forecasting baselines and chronological held-out evaluation |
+| v0.7 | Planned | Read-only, evidence-based AI tool orchestration with human review |
+| v0.8 | Optional research | Buffered gateway, secure transport and remote telemetry prototype |
 
-**All bundled fixtures and the DBC are synthetic.** No Volkswagen ID.3 or Porsche
-Taycan signal definitions have been verified or implemented. Research access was
-blocked in this environment; see [dataset investigation](docs/datasets.md).
-The demo proves application communication using python-can's virtual transport;
-it does not prove kernel SocketCAN support.
+[Roadmap acceptance criteria](docs/ROADMAP.md) define what would justify each claim.
+This restructuring milestone implements none of v0.4–v0.8.
 
-## Phase 2: real-world decoded telemetry and diagnostics
+## Validation and testing
 
-Select **Real-World EV Dataset** in the existing dashboard to upload `.xlsx`
-measurements such as `vehicle#1.xlsx`. The new workflow preserves raw timestamps,
-original source columns, dataset ID, declared units, file SHA-256, recording order,
-and suspicious measurements. It adds configurable data-quality checks, vehicle
-dynamics inspection, cell-temperature plots, signed battery power, and
-play/pause/reset replay without CAN hardware or invented CAN identifiers.
+**215 automated tests passed** in this architecture revision, retaining all 211
+v0.3 tests. Coverage includes independent synthetic CAN vectors, virtual transport,
+imports, uncertainty, engineering calculations, replay, exports and dashboard
+integration. The latest executed environment/platform checks are recorded in
+[docs/validation.md](docs/validation.md); historical SCUT results are kept separate
+from any current rerun. Installation needs package access; local analysis itself
+requires no AI service, internet connection, cloud platform or private dataset.
 
-The public `vehicle#1.xlsx` has now been checked across all **81,898** rows.
-Its source README documents most units and charging codes, but not the year,
-timezone, current polarity, SOC scale or exact timestamp encoding. The configurable
-`MDDHHMMSS` interpretation fits every calendar value and the supplied minute
-rollover; it remains explicitly **inferred** and never invents a year. See the
-[full source review](docs/validation.md#public-vehicle1-source-review-and-qualityvisualization-correction).
+## Quick start
 
-In the dashboard, enable **Use source-reviewed SCUT profile (timestamp encoding
-remains inferred)** for this specific public workbook. It provides elapsed time,
-source-documented units/status labels, and 10-second cadence screening. SOC units
-and current polarity remain unknown. Without this explicit selection, numeric
-raw timestamps retain the unverified-time fallback. Physical, metadata, time and
-missing-data counts are independent; legacy conservative flags remain available.
-Shared interval/possible-segment controls synchronize plots and break lines at
-possible recording boundaries. Yearless calendar parsing is not a Unix decoder.
+Requires Git and **Python 3.12**. This revision is on
+`refactor/engineering-architecture-roadmap`; the validated v0.3 branch is preserved.
+The version lock includes Streamlit and Excel/test dependencies. It was produced
+for Python 3.12 on Linux; it is not an artifact-hash or native-Windows validation claim.
 
-Signed power is `V × I / 1000` only when input units/values permit it. Unknown
-polarity never receives charging/discharging sign labels. No verified-efficiency or battery-health estimate is asserted; v0.3 adds qualified signed energy over accepted intervals.
+**Windows PowerShell:** use a short writable path, for example
+`C:\Projects\CAN-Lab-v0.3`. These Windows commands are provided and reviewed, but
+native Windows execution was not available in the Linux verification environment.
+No virtual-environment activation or execution-policy change is required.
 
-Generate and analyze a clearly synthetic workbook:
-
-```bash
-python examples/make_ev_fixture.py /tmp/synthetic-ev.xlsx
-can-lab analyze-xlsx /tmp/synthetic-ev.xlsx \
-  --profile /tmp/synthetic-ev.profile.json --output-prefix outputs/synthetic-ev
+```powershell
+New-Item -ItemType Directory -Force C:\Projects | Out-Null
+git clone --branch refactor/engineering-architecture-roadmap https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git C:\Projects\CAN-Lab-v0.3
+Set-Location C:\Projects\CAN-Lab-v0.3
+py -3.12 -m venv .venv
+& .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
+& .\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
+& .\.venv\Scripts\python.exe -m pip check
+& .\.venv\Scripts\python.exe -m pytest -ra
+& .\.venv\Scripts\python.exe -m can_lab.cli demo --steps 10
+& .\.venv\Scripts\python.exe -m streamlit run src/can_lab/dashboard.py --server.headless true --browser.gatherUsageStats false
 ```
 
-For a compatible local `vehicle#1.xlsx`, select **Real-World EV Dataset**, upload your local file,
-and configure the correct worksheet, dataset ID, time representation, source
-units and optional documented current convention under **Source profile and
-quality thresholds**. A profile JSON can supply those declarations. Do not reuse
-the synthetic profile as evidence of real dataset units. Missing columns and
-invalid values stay visible with quality flags; duplicate/reversed/irregular time,
-SOC limits, voltage problems, possible -40 degC sentinels, discontinuities and
-flatlines are diagnosed without deleting rows. Unknown/unordered time blocks timed
-replay while diagnostics and exports remain available.
+Stop Streamlit with Ctrl+C. Optionally generate a clearly synthetic workbook and
+engineering reports using fresh output filenames:
 
-Download provenance-rich recording JSON, quality-annotated CSV and diagnostic
-JSON from **Exports & Source**. CSV begins with a metadata comment; it is distinct
-from Phase 1 canonical CSV. See [the Phase 2 technical guide](docs/real_world_telemetry.md)
-for mapping, threshold definitions, replay semantics, export formats, source and
-attribution verification requirements, resource limits and reproducible analysis.
-No research dataset is committed or required at startup.
+```powershell
+New-Item -ItemType Directory -Force outputs | Out-Null
+& .\.venv\Scripts\python.exe examples/make_ev_fixture.py outputs/synthetic.xlsx
+& .\.venv\Scripts\python.exe -m can_lab.cli report-xlsx outputs/synthetic.xlsx --profile outputs/synthetic.profile.json --output-prefix outputs/report --include-features
+```
 
-## Reproducible installation
-
-Use **Python 3.12** for the tested, pinned development environment. From the
-repository root:
+**Linux/macOS shell:** the commands below are verified on Linux; macOS is not
+claimed as tested. Run from a checkout of this branch:
 
 ```bash
 python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements-lock.txt
-python -m pip install --no-build-isolation --no-deps -e .
-python -m pip check
-python -m pytest -ra
+.venv/bin/python -m pip install -r requirements-lock.txt
+.venv/bin/python -m pip install --no-build-isolation --no-deps -e .
+.venv/bin/python -m pip check
+.venv/bin/python -m pytest -ra
+.venv/bin/python -m can_lab.cli demo --steps 10
+.venv/bin/python -m streamlit run src/can_lab/dashboard.py --server.headless true --browser.gatherUsageStats false
 ```
 
-`requirements-lock.txt` pins the tested development and UI dependencies,
-including build tools and pandas/openpyxl Excel support, for Python 3.12. It is a version lock, not an artifact hash
-lock. For a smaller runtime installation without tests/UI, use
-`python -m pip install .`; for flexible development resolution use
-`python -m pip install -e '.[dev,ui]'` (UI includes Excel support);
-`python -m pip install -e '.[excel]'` installs only the workbook extra. These alternatives are not locked.
-No application credentials or external services are required.
+The demo uses two virtual bus instances in one process; it is not physical CAN.
+The [engineering guide](docs/engineering_v0.3.md#reproduce) covers reports and
+Linux SocketCAN details remain in [Workflows](docs/WORKFLOWS.md#local-can-reproduction).
 
-## Portable ECU communication
+## Engineering documentation
 
-```bash
-mkdir -p outputs
-can-lab demo --steps 100 --output outputs/demo.json
-```
+| Document | Purpose |
+| --- | --- |
+| [Architecture](docs/architecture.md) | Six layers, actual dependencies, review findings and schema v1 |
+| [Workflows](docs/WORKFLOWS.md) | Three engineering problems, implemented/planned boundaries and commands |
+| [Roadmap](docs/ROADMAP.md) | v0.3–v0.8 scope and acceptance criteria |
+| [Data schema](docs/architecture.md#schema-v1) / [recording mapping](docs/real_world_telemetry.md#source-mapping) | Canonical vs provenance-rich recording models |
+| [Dataset guide](docs/real_world_telemetry.md) | SCUT attribution, source units and timestamp uncertainty |
+| [Engineering guide](docs/engineering_v0.3.md) | Calculations, thresholds, module file map and dashboard descriptions |
+| [Validation record](docs/validation.md) | Executed evidence, historical checks and unresolved limitations |
+| [Earlier dataset research](docs/datasets.md) | Unverified ID.3/Taycan investigation; no vehicle adapter claims |
 
-This creates separate sender and receiver bus instances on a private in-process
-virtual channel, sends both original frame types, decodes via the DBC, and
-exports 200 sparse telemetry observations. It terminates and releases both buses.
-It works without root or a CAN-capable kernel. python-can `virtual` buses do
-**not** communicate between independent processes; use SocketCAN below for that.
-Output commands refuse to overwrite existing files; select a new output path
-for repeated runs.
+## Visual evidence and limitations
 
-## Linux SocketCAN workflow
+No genuine dashboard screenshots are stored in this repository. The tested views
+are described in the [engineering guide](docs/engineering_v0.3.md#dashboard-description);
+no screenshot or visual demonstration is fabricated.
 
-Requires a Linux kernel with CAN_RAW/vcan support, `iproute2`, `kmod`, and network
-administration privileges. In an appropriately privileged host/container:
-
-```bash
-sudo modprobe vcan
-# Create only if vcan0 does not already exist:
-sudo ip link add dev vcan0 type vcan
-sudo ip link set dev vcan0 up
-```
-
-From the repository root, with the installed environment active, use two terminals:
-
-```bash
-# Terminal 1: prints decoded schema samples; waits up to 5 seconds per frame
-can-lab receive --channel vcan0
-# Terminal 2: original 100 Hz synthetic ECU
-can-lab simulate --channel vcan0
-```
-
-Start the sender promptly, or start it before the receiver. Ctrl+C stops either
-process. For bounded capture: `can-lab receive --count 200 --output outputs/live.json`.
-The original commands also remain available after installation:
-`python can_project/ecu_simulator.py` and
-`python can_project/dashboard_receiver.py`. Bus failures now exit nonzero.
-Do not connect this synthetic transmitter to a physical vehicle network.
-
-The onboarding host lacks CAN socket support and CAP_NET_ADMIN, so native
-SocketCAN execution could not be validated here. That is a host limitation.
-
-## Import, transform and export
-
-```bash
-can-lab import tests/fixtures/synthetic.csv --format csv --output outputs/normalized.json
-can-lab import tests/fixtures/synthetic.json --format json --output outputs/normalized.csv
-can-lab import tests/fixtures/synthetic.log --format candump --output outputs/can.json
-can-lab import tests/fixtures/mapped.csv --format csv \
-  --profile tests/fixtures/profile.json --source synthetic-mapped-fixture \
-  --time-basis relative --max-gap-s 2 --output outputs/converted.json
-```
-
-CSV uses a header and one sample per row; JSON uses an array of sample objects.
-Canonical field names/units are accepted directly. A profile explicitly maps
-source column names to schema names and specifies input units; it selects only
-those columns. Without a profile, unknown fields fail rather than being silently
-dropped. No units, current polarity, timestamp basis, or vehicle identity are
-inferred. Profiles must reflect the recording's documentation.
-
-The raw log importer accepts **classical data-frame `candump -L`** lines such as
-`(1700000000.000000) vcan0 100#09C4410000000000`. It decodes only the bundled
-synthetic protocol, rejects unknown IDs, malformed frames, FD/RTR/error/extended
-frames, and mixed channels. It is not a general vehicle log decoder. Select an
-appropriate `--time-basis` if the log contains relative timestamps; the candump
-default is Unix, CSV/JSON default is relative unless per-row metadata is present.
-Per-row metadata takes precedence over defaults.
-
-See [schema and architecture](docs/architecture.md) for API examples, units,
-validation policy and extension boundaries. Missing signals remain `null` in JSON
-and blank in CSV. Export preserves timestamps, source, flags and time basis.
-These commands load their input into memory; they target research-size recordings,
-not unlimited-duration captures.
-
-## Telemetry visualization
-
-With UI dependencies installed:
-
-```bash
-python -m streamlit run src/can_lab/dashboard.py --server.address 127.0.0.1 \
-  --server.headless true --browser.gatherUsageStats false
-```
-
-Use the local Streamlit interface on a machine where you can access its port.
-Choose Virtual ECU Simulation to generate a sample or upload
-`tests/fixtures/synthetic.csv` / canonical JSON/CSV exports. Choose Imported CAN Log for a supported
-synthetic `.log` file. Choose the recording's time basis, inspect flags, select
-signals for separate unit-specific plots, and download standardized JSON/CSV.
-Plots connect observed points without filling missing fields; they are not a
-synchronized vehicle-state estimate. Vehicle-specific CSV/JSON tables must first be
-normalized with an explicit CLI profile. Excel workbooks have the separate
-Real-World EV Dataset workflow described above. This UI is for local development;
-authentication and remote deployment are outside this phase.
-
-## Validation and next steps
-
-`python -m pytest -ra` covers independent known CAN vectors, original synthetic
-signals, malformed frames, real virtual-bus transmission/reception, import errors,
-unit/polarity conversions, timestamp ordering, optional signals, quality flags,
-export round trips, CLI behavior and Streamlit rendering with a synthetic upload.
-GitHub Actions runs the suite and a bounded demo on Python 3.12 without root.
-
-Next: obtain a licensed, documented vehicle recording and signal dictionary;
-validate its mapping and current polarity against reference values; then add an
-adapter and recorded golden tests. Validate SocketCAN on a capable Linux host.
-Future VEUS and EV Battery Health ML projects can consume `TelemetrySample` or
-its exports without coupling to CAN or vehicle file formats. Neither downstream
-application is implemented here.
-
-See [repository audit](docs/repository-audit.md) for removed environment files and
-historical exposure limitations.
+Physical CAN hardware and independent real-vehicle recording/DBC validation remain
+outstanding. The current codec covers the synthetic classical-CAN protocol only:
+no CAN FD, Automotive Ethernet, general OEM decoder, forecasting model, AI agent,
+automated root-cause system, connected gateway or cloud backend is claimed.
+Screening findings are not confirmed faults or SOH estimates. A future agent would
+coordinate validated tools, not replace numerical methods or human judgment.

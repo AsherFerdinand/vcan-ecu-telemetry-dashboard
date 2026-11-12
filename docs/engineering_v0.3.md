@@ -1,3 +1,5 @@
+> Architecture revision: see [the layer/dependency review](architecture.md), [workflows](WORKFLOWS.md) and [roadmap](ROADMAP.md). CLI and Streamlit share `pipeline.prepare_workbook`; the numerical policies documented below are unchanged.
+
 # v0.3 engineering analysis and validation
 
 This release integrates the validated Phase 2 recording pipeline with optional
@@ -243,5 +245,6 @@ is committed. Native/hardware CAN validation is not claimed.
 | `engineering.py` | Electrical statistics, session assembly and analysis config |
 | `engineering_reports.py` | JSON/Markdown/feature CSV reports |
 | `engineering_dashboard.py` | Bounded engineering views and session/report controls |
+| `pipeline.py` | Shared headless decoded-workbook preparation for CLI and UI |
 | Existing `recorded_dashboard.py`, `workbook_cli.py`, `cli.py` | Additive UI/CLI integration |
 | `tests/test_engineering.py`, existing dashboard tests | Analytical and integration regression coverage |

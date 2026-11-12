@@ -11,9 +11,9 @@ import time
 import altair as alt
 import pandas as pd
 import streamlit as st
-from .diagnostics import calculate_power, iter_vehicle_dynamics
-from .excel import load_xlsx
-from .quality import QualityConfig, quality_summary, validate_recording
+from .diagnostics import iter_vehicle_dynamics
+from .pipeline import prepare_workbook
+from .quality import QualityConfig, quality_summary
 from .recorded_io import export_recording_json, export_annotated_csv, export_diagnostic_summary
 from .recording import COLUMNS, DatasetProfile, numeric
 from .replay import RecordingSource, Replay
@@ -180,9 +180,8 @@ def render_real_world():
         key = ('review-v3', upload_digest(upload), upload.name, sheet, max_rows,
                json.dumps(asdict(profile), sort_keys=True), json.dumps(asdict(config), sort_keys=True))
         if st.session_state.get('_ev_recording_key') != key:
-            recording = load_xlsx(upload, profile=profile, sheet=sheet or None, max_rows=int(max_rows), filename=upload.name)
-            validate_recording(recording, config)
-            calculate_power(recording)
+            recording = prepare_workbook(upload, profile=profile, quality_config=config,
+                                         sheet=sheet or None, max_rows=int(max_rows), filename=upload.name)
             st.session_state['_ev_quality_summary'] = quality_summary(recording)
             st.session_state['_ev_timestamp_report'] = inspect_timestamps(recording)
             st.session_state['_ev_anomaly_report'] = anomaly_report(recording)
