@@ -2,4 +2,4 @@
 
 Import the telemetry module directly for consumers that do not use CAN.
 """
-__version__ = "0.4.0.dev0"
+__version__ = "0.4.5.dev0"

@@ -90,6 +90,7 @@ def test_invalid_profile_and_quality_config_show_errors():
 
 def test_virtual_source_can_generate_samples_without_upload():
     app = AppTest.from_file(str(DASHBOARD)).run()
+    app.radio(key='workbench_page').set_value('Vehicle data').run()
     app.button(key='run_virtual_demo').click().run()
     assert not app.exception and not app.error
     assert len(app.dataframe[0].value) == 100

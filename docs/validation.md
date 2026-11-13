@@ -613,3 +613,88 @@ remains 9,530,318 bytes. No raw log, research DBC, workbooks, Parquet, archive o
 runtime output appears among staged changes. Ignore checks explicitly cover them;
 only scoped authored DBC fixtures are exceptions. The documentation-only follow-up
 records this execution and does not change tested numerical code.
+
+## v0.4.5 Interactive Engineering Workbench — 2026-11-13
+
+Started at verified `377d68af559a27947a2693c39ebf3c6bfe5d742d` on
+`dev/v0.4-real-can-validation`. Local/remote branch inspection found no existing
+interactive-learning work to reuse. Work is isolated on
+`feat/interactive-engineering-workbench`; main and the evidence branch are preserved.
+Package version is `0.4.5.dev0`, a workbench development milestone, not a new
+independent physical validation claim. The unavailable BusBench GIF was not
+inspected; the written visual description was used without copied assets.
+
+### Implemented and executed
+
+- A single Streamlit entry point now opens Overview with six working module cards,
+  a dark navy sidebar, light workspace, orange accents, technical labels and native
+  controls. Previous data-source delivery moved into `telemetry_dashboard.py`;
+  numerical import, Recording, replay, engineering and export implementations are
+  unchanged. Two UI regression tests now navigate explicitly to Vehicle data
+  before their original assertions; no baseline test case was removed.
+- Offline educational DBC speed: `38 AD 21 03 0E 00 00 00` on 0x257 → raw 538 →
+  3.04 km/h; changing AD to BD → raw 539 → 3.12 km/h. cantools performs decoding
+  through existing VCAN loaders. Tests cover original big-endian RPM, authored
+  signed 12-bit Motorola byte crossing, Intel mapping, invalid input and clearing
+  stale results. Display traversal handles the Motorola bit-0-to-bit-15 jump.
+- Network presets configure actual periods/phases, simultaneous releases, stopped
+  transmission and user payloads. Logical timestamps are deterministic integers;
+  original `simulator.frames`, SyntheticCodec and python-can virtual transport are
+  reused. No bus occupancy/arbitration delays or production topology are implied.
+  Maximum tested retention is 4004 events, without sleeps or source copies.
+- Controlled missing-message, jitter and signal-step rules preserve exact event
+  references, original payloads/times, thresholds and ground truth. Tests exercise
+  no arrivals, strict threshold equality, calculated rates, unchanged inputs and
+  inspector reset after a shorter run. These are educational rules, not v0.5
+  production anomaly detection or confirmed faults.
+- Learn CAN provides 20 beginner/detail FAQ entries and eight questions split
+  across beginner/intermediate levels. Scoring, unanswered feedback, hints, retry,
+  answer changes and contextual navigation are tested. No account, personal data,
+  database or AI API is used.
+
+### Verification evidence
+
+Full suite: **324 passed, 1 skipped** in 17.23 s, retaining all 276 baseline cases.
+The skipped case is the explicitly optional external KUKSA integration; enabled
+separately against the previously retained inputs it passed (**1 passed**, 2.55 s).
+Default tests do not download research data. The original virtual CAN CLI demo
+processed **20 samples, zero flagged**. Existing replay, DBC, workbook quality,
+engineering and export regressions passed. Locked dependencies are unchanged;
+`pip check` and the offline documentation-link checker passed. A built wheel was
+checked for the packaged `can_lab/data/education.dbc`, ensuring the teaching
+resource is included without downloading a vehicle DBC.
+
+Actual running UI was checked in installed Linux Chromium using the already
+available Playwright runtime; no browser/frontend dependencies were added to the
+project. Keyboard activation opened Frame Laboratory. Browser checks verified
+payload recalculation, reset, network counts, fault evidence and a submitted
+unanswered quiz score of 0/4. No page errors or Streamlit exception blocks occurred.
+The server health endpoint returned `ok`. At 1024×768 there was no document-level
+horizontal overflow; result labels were adjusted after laptop-width inspection.
+This is targeted verification, not a formal accessibility audit or native Windows/
+macOS test. The two [actual screenshots](workbench.md#actual-application-screenshots)
+were deliberately captured at 1440×1080; no mockup/GIF is presented as running UI.
+
+### Storage and limits
+
+Starting tracked source: **85 files / 462,707 bytes**. Historical ignored outputs:
+**29 files / 484,212 bytes**, unchanged through the experiments and tests. The only
+new binary source artifacts are two requested actual documentation JPEGs:
+`workbench-overview.jpg` 122,606 bytes and `workbench-frame.jpg` 97,200 bytes
+(**219,806 bytes total**). They are permanent documentation evidence, not automatic
+plot exports. Teaching inputs/results and quiz state stay in memory; no persistent
+cache, research download, new environment, duplicated recording, ZIP or automatic
+cleanup was introduced. A small verification wheel/build products remain ignored
+or external. Existing inputs and historical reports were not deleted.
+
+Independent physical validation still awaits the acquisition clarifications and
+aligned references in the KUKSA investigation. The next workbench milestone should
+measure learner usability/accessibility and native Windows behaviour, while keeping
+production detector evaluation separate from teaching thresholds.
+
+The staged-source audit measured 97 tracked files, approximately **0.76 MB** total
+including 0.22 MB of screenshots; source remained below 0.8 MB. Ignored generated
+outputs stayed at 484,212 bytes. The packaged teaching example was also decoded
+successfully directly from the built wheel with isolated Python import paths
+(raw 538, 3.04 km/h), without an external DBC or a new environment. Exact working
+content-byte counts can be reproduced with `can-lab storage-audit` at this revision.

@@ -267,3 +267,28 @@ Independent test vector `0BB8480000000000` means 3000 rpm, 72 km/h;
 decoding, so a symmetric encode/decode mistake cannot alone pass verification.
 These definitions come from the original repository code, not an OEM DBC.
 Unsigned temperature is intentional compatibility with that synthetic protocol.
+
+
+## Interactive workbench delivery (v0.4.5)
+
+`dashboard.py` remains the sole Streamlit entry point. It now provides sidebar
+navigation and dispatches to `workbench_dashboard` or `telemetry_dashboard`. The
+latter contains the previous data-source UI without changing its import/replay/
+engineering functions. Existing source keys and data models remain available.
+`workbench_style` and `.streamlit/config.toml` supply a small local visual system;
+no remote fonts, frontend bundle or runtime dependency was introduced.
+
+`workbench.py` is presentation-independent. Frame experiments use the existing
+`load_classical_dbc`, `SyntheticCodec` and packaged teaching DBC; cantools remains
+the decoder. The separate bit traversal implements only signal highlighting. A
+bounded logical scheduler reuses original `simulator.frames`, codec and python-can
+virtual transport. It models neither wire arbitration nor production ECU topology.
+New narrow teaching rules emit threshold evidence against those generated events;
+they do not replace workbook quality/engineering or implement the planned v0.5
+detector. `learning.py` supplies static FAQ/questions and pure quiz scoring.
+
+All experiment state is in memory/session state. Network execution retains at
+most 4004 events; there is no disk cache, automatic plot export, research download
+or background replay loop. Knowledge feedback references submitted answers and
+is cleared when they change. Existing numeric, source provenance, uncertainty and
+reporting contracts remain intact. See the [workbench guide](workbench.md).

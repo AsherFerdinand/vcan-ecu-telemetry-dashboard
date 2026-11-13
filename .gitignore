@@ -58,3 +58,4 @@ data/manifests/*
 *.dbc
 !src/can_lab/data/synthetic.dbc
 !tests/fixtures/raw_can/example.dbc
+!src/can_lab/data/education.dbc

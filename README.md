@@ -48,6 +48,21 @@ frames and three manual byte checks. The [raw CAN guide](docs/raw_can_validation
 retains the original candidate assessments and evidence boundaries.
 Rules and thresholds remain screening heuristics, not a validated anomaly detector.
 
+## Interactive Engineering Workbench (v0.4.5)
+
+The Streamlit frontend now combines a navy sidebar, light workspace and compact
+module cards with three deterministic experiences: **Frame Laboratory** (live
+payload/bit/scaling inspection), **Virtual CAN Network** (configurable logical
+releases over existing virtual transport), and **Fault Investigation** (known
+synthetic timing, silence and signal-step events). **Learn CAN** adds 20 FAQ topics
+and a scored, explained local quiz. Existing data, replay, diagnostics and reports
+remain under **Vehicle data → Existing data workflows**.
+
+The offline speed example decodes raw 538 to **3.04 km/h**; editing its payload
+recalculates the result. Teaching simulations are separate from real-data evidence.
+See the [quick guide and actual screenshots](docs/workbench.md) for controls,
+assumptions and the distinction between DBC interpretation and physical accuracy.
+
 ## Engineering architecture
 
 Solid paths are implemented; dashed paths are planned or optional. The six-layer
@@ -132,6 +147,7 @@ are in the [dataset guide](docs/real_world_telemetry.md) and [validation record]
 | --- | --- | --- |
 | v0.3 | Implemented foundation | Synthetic CAN, decoded EV telemetry, deterministic diagnostics, UI/reports |
 | v0.4 | Synthetic-validated foundation; real-data gate blocked | 10,000 source-reported vehicle frames decoded (Level 2); provenance caveats and independent physical validation outstanding |
+| v0.4.5 | Interactive workbench implemented | Synthetic learning experiments; source-qualified data workflows retained |
 | v0.5 | Planned | Evaluated event/anomaly detection, including message timing |
 | v0.6 | Planned | Forecasting baselines and chronological held-out evaluation |
 | v0.7 | Planned | Read-only, evidence-based AI tool orchestration with human review |
@@ -142,7 +158,7 @@ v0.4 is a foundation/pre-release, not a completed real-data milestone; v0.5–v0
 
 ## Validation and testing
 
-**276 automated tests passed** in this revision, retaining all 263 preceding tests; one external-data test is
+**324 automated tests passed** in this revision, retaining all 276 preceding tests; one external-data test is
 skipped by default and passed separately against the pinned KUKSA inputs. Coverage includes independent synthetic CAN vectors, virtual transport,
 imports, uncertainty, engineering calculations, replay, exports and dashboard
 integration. The latest executed environment/platform checks are recorded in
@@ -153,19 +169,19 @@ requires no AI service, internet connection, cloud platform or private dataset.
 ## Quick start
 
 Requires Git and **Python 3.12**. This revision is on
-`dev/v0.4-real-can-validation`; the validated v0.3 branch is preserved.
+`feat/interactive-engineering-workbench`; the validated v0.3 branch is preserved.
 The version lock includes Streamlit and Excel/test dependencies. It was produced
 for Python 3.12 on Linux; it is not an artifact-hash or native-Windows validation claim.
 
 **Windows PowerShell:** use a short writable path, for example
-`C:\Projects\CAN-Lab-v0.4`. These Windows commands are provided and reviewed, but
+`C:\Projects\CAN-Lab-v0.4.5`. These Windows commands are provided and reviewed, but
 native Windows execution was not available in the Linux verification environment.
 No virtual-environment activation or execution-policy change is required.
 
 ```powershell
 New-Item -ItemType Directory -Force C:\Projects | Out-Null
-git clone --branch dev/v0.4-real-can-validation https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git C:\Projects\CAN-Lab-v0.4
-Set-Location C:\Projects\CAN-Lab-v0.4
+git clone --branch feat/interactive-engineering-workbench https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git C:\Projects\CAN-Lab-v0.4.5
+Set-Location C:\Projects\CAN-Lab-v0.4.5
 py -3.12 -m venv .venv
 & .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 & .\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
@@ -226,6 +242,7 @@ retention, safe output paths, backup responsibilities and resource bounds.
 
 | Document | Purpose |
 | --- | --- |
+| [Workbench guide](docs/workbench.md) | Interactive experiments, FAQ/quiz and actual application screenshots |
 | [Architecture](docs/architecture.md) | Six layers, actual dependencies, review findings and schema v1 |
 | [Workflows](docs/WORKFLOWS.md) | Three engineering problems, implemented/planned boundaries and commands |
 | [Roadmap](docs/ROADMAP.md) | v0.3–v0.8 scope and acceptance criteria |
@@ -237,9 +254,9 @@ retention, safe output paths, backup responsibilities and resource bounds.
 
 ## Visual evidence and limitations
 
-No genuine dashboard screenshots are stored in this repository. The tested views
-are described in the [engineering guide](docs/engineering_v0.3.md#dashboard-description);
-no screenshot or visual demonstration is fabricated.
+Two small [actual workbench screenshots](docs/workbench.md#actual-application-screenshots)
+are retained as documentation evidence. They show the running Linux browser UI,
+not physical vehicle validation or fabricated mockups.
 
 Physical CAN hardware and independent real-vehicle recording/DBC validation remain
 outstanding. The original codec retains its synthetic protocol; the configurable investigation

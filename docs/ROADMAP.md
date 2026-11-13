@@ -8,6 +8,7 @@ behaviour. Company inspirations in [Workflows](WORKFLOWS.md) are not affiliation
 | --- | --- | --- |
 | v0.3 | Implemented foundation | Reproducible synthetic CAN and decoded-telemetry checks |
 | v0.4 | Implemented foundation, synthetic-validated; real-data gate blocked | Independent real-recording / matching-DBC validation |
+| v0.4.5 | Interactive workbench implemented | Offline teaching experiments, quiz and existing data workflows; independent physical evidence remains pending |
 | v0.5 | Planned | Measured event/anomaly detection performance |
 | v0.6 | Planned | Chronological held-out forecasting evaluation |
 | v0.7 | Planned | Logged, human-reviewed AI tool orchestration compared with scripted automation |
@@ -63,6 +64,15 @@ The [KUKSA investigation](kuksa_investigation.md) selects the source-reported
 small vehicle excerpt and bundled DBC for Level 2, with unresolved date/software
 attribution and capture-specific rights. No dataset is acquired automatically. The implemented adapter
 is not evidence of independent vehicle accuracy.
+
+## v0.4.5 — Interactive engineering workbench
+
+Implemented teaching delivery: offline frame/bit inspection, bounded virtual-node
+release schedules, known synthetic fault experiments, FAQ and local quiz. It
+reuses existing codec, simulation and engineering workflows. See the
+[workbench guide](workbench.md) for tested controls and limits. These educational
+thresholds do not meet or replace the v0.5 detector evaluation gate below. No new
+physical-accuracy claim follows from the interface or quiz.
 
 ## v0.5 — Automated event and anomaly detection
 
