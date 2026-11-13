@@ -1,6 +1,6 @@
 # VCAN
 
-### Automotive CAN Engineering Studio
+### Automotive CAN Engineering Studio · v0.4.8
 
 **Trace a CAN measurement from differential signalling to decoded telemetry—and inspect the evidence behind it.**
 
@@ -18,6 +18,8 @@ No cloud account, AI API or private dataset is required to explore the studio.
 
 These GIFs record the **actual running application** with automated Chromium
 interactions. They contain no mock screens, injected results or fabricated traffic.
+The clips show the v0.4.7 workbench base; v0.4.8 publishes that same functionality
+with stable release metadata and portfolio documentation.
 [Recording method, asset verification and reproduction](docs/portfolio_recording.md).
 
 ### 1 · From payload bits to vehicle speed
@@ -108,7 +110,7 @@ Recordings/workbooks are not bundled. No ID.3 or Taycan adapter is advertised;
 Requires **Python 3.12** and Git. Run from the repository root:
 
 ```bash
-git clone --branch feat/portfolio-readme-demonstrations https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git
+git clone --branch main https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git
 cd vcan-ecu-telemetry-dashboard
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lock.txt

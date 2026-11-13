@@ -996,3 +996,29 @@ The staged read-only inventory measured **7.74 MB** in
 revision. The **6.69 MB** GIF set accounts for nearly all growth; historical
 generated outputs remain **484.21 KB**. Counts describe working tracked content,
 not compressed Git history, environments or external raw capture takes.
+
+## v0.4.8 publication preparation — 2026-11-13
+
+Source `31d4047c886ba69af0265f3d35e5797f27b11e0e` contains the v0.4.5,
+v0.4.6, v0.4.7 and portfolio developments. Fetched main
+`d04f388b25a4b46d1175f33e5bd69ce0d40eb7fc` is its ancestor: zero main-only
+commits, eleven source-only commits before preparation. No main work is discarded.
+The preparation sets package metadata to stable **0.4.8** and points installation
+at `main`; the recorded v0.4.7 GIF label remains accurately documented as capture
+provenance. No calculation, decoder or workbench behaviour changed.
+
+Local release checks: **375 passed, 1 skipped** (15.98 s); dependency check passed;
+virtual demo processed 20 samples with zero flagged. The optional KUKSA inputs
+were absent and were not downloaded. Synthetic workbook generation, analysis and
+JSON/Markdown/feature export commands from CI also succeeded. Streamlit started,
+health returned `ok`, and Chromium displayed `VCAN 0.4.8` without page/Streamlit
+errors. Native image loading verified the hero, local badge SVG and all three
+1120×960 GIFs. All GIF frames/timing/hashes and 69 local links passed verification.
+No datasets, raw videos or generated reports were added; tracked content remains
+approximately **7.74 MB**, with **6.69 MB** of final GIFs.
+
+Publication is not claimed by these local checks. GitHub API requests in this
+execution are rejected at CONNECT with HTTP 403 Forbidden, including an escalated
+attempt; `gh` also cannot establish valid authentication. Consequently PR creation,
+required checks/branch protection and a GitHub-supported merge cannot yet be
+verified. Main must remain unchanged until that authenticated workflow succeeds.

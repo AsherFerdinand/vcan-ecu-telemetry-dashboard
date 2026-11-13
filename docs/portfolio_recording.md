@@ -1,10 +1,14 @@
 # Portfolio capture and asset verification — v0.4.8
 
 The README demonstrations are recordings of the running **v0.4.7 application**.
-This documentation milestone does not change its calculations, signal definitions,
-UI source or application version. The capture manifest pins the application Git
-commit and `src` tree object; compare that tree with the final portfolio revision
-to establish that the demonstrated application is unchanged.
+The original recording milestone did not change its calculations, signal definitions,
+UI source or application version. The publication-preparation commit sets the package
+version to stable **0.4.8**; the recorded workbench functionality/calculations remain
+unchanged. The visible v0.4.7 label is capture provenance, not a claim to be a newly
+recorded v0.4.8 screen. The capture manifest pins the application Git
+commit and `src` tree object. Comparing the recorded source with the prepared
+release shows only `can_lab.__version__` changing to 0.4.8; the demonstrated
+calculations and workbench implementation are unchanged.
 
 ## Method
 
