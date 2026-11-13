@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 import pandas as pd
 import streamlit as st
+from .artifacts import display_sizes
 from .can_recording import CANConfig, investigate_candump
 from .can_reports import export_can_json, export_can_markdown
 from .engineering import analyze_engineering
@@ -56,7 +57,7 @@ def render_raw_can():
     for column,key in zip(columns,('scanned_records','decoded_frames','unknown_id_frames','malformed_records')):
         column.metric(key,result.coverage[key])
     if result.coverage['limit_reached']:st.warning('Processing limit reached: coverage describes only the bounded scan, not the complete source.')
-    st.json({'source':result.source,'dbc':result.dbc,'coverage':result.coverage,'configuration':result.configuration})
+    st.json(display_sizes({'source':result.source,'dbc':result.dbc,'coverage':result.coverage,'configuration':result.configuration}))
     st.subheader('DBC signal inspection')
     names=sorted({(entry.frame.arbitration_id,name) for entry in result.frames if entry.status=='decoded' for name in entry.signals})
     if names:

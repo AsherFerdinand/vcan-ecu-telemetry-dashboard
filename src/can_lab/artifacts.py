@@ -112,3 +112,21 @@ def audit_storage(repository_root,*,output_root=None):
             'generated_file_count':len(generated),'generated_bytes':sum(f['bytes'] for f in generated),
             'largest_generated':sorted(generated,key=lambda f:(-f['bytes'],f['path']))[:10],
             'symlinks_skipped':skipped,'operations':'read-only; no cleanup or deletion performed'}
+
+
+def format_size(byte_count):
+    """Decimal display only; callers retain exact integers for evidence/hashes."""
+    if type(byte_count) is not int or byte_count<0:raise ValueError('Size must be a nonnegative integer')
+    value=byte_count/1000
+    for unit in ('KB','MB','GB','TB'):
+        if round(value,2)<1000 or unit=='TB':return f'{value:.2f} {unit}'
+        value/=1000
+
+
+def display_sizes(value):
+    """Copy a human-facing view; never mutate a manifest or source configuration."""
+    if isinstance(value,list):return [display_sizes(item) for item in value]
+    if isinstance(value,dict):
+        return {(key[:-5]+'size' if key.endswith('bytes') else key):format_size(item)
+                if key.endswith('bytes') and type(item) is int else display_sizes(item) for key,item in value.items()}
+    return value

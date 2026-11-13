@@ -292,3 +292,27 @@ most 4004 events; there is no disk cache, automatic plot export, research downlo
 or background replay loop. Knowledge feedback references submitted answers and
 is cleared when they change. Existing numeric, source provenance, uncertainty and
 reporting contracts remain intact. See the [workbench guide](workbench.md).
+
+
+## Visual CAN studio (v0.4.6)
+
+`can_physics.py` adds pure standard-frame construction, CRC-15/CAN, stuffing,
+identifier arbitration and ideal differential calculations. It does not decode
+DBC signals. Existing cantools and synthetic signal/transport functions remain
+authoritative. `studio_playback.py` supplies a bounded event playhead and inspector
+over unchanged experiment data. `studio_dashboard.py` provides native segmented
+navigation/controls and timed Streamlit fragments, active only during playback.
+`studio_diagrams.py` renders original calculated field/arbitration diagrams and
+a single isolated HTML/SVG component. Its interface takes experiment/event data;
+JavaScript only changes a local node-information panel, never generates simulation
+events. CSS pulse state follows the Python playhead and supports reduced motion.
+
+The network scheduler still orders equal releases for display without calculating
+wire occupancy; actual bitwise arbitration is a separate explicitly scoped lab.
+Broadcast receivers are model assumptions backed by a shared python-can observer,
+not separate production ECU models. The fault scenarios reuse their existing
+injections and evidence; normal/injected timelines add presentation only.
+`artifacts.format_size`/`display_sizes` copy human-facing size displays in decimal
+units; exact integers remain in audit calculations, JSON evidence and manifests.
+No new runtime dependency, dataset, rendering service or full frontend migration
+was introduced. See [studio conventions](workbench.md#visual-studio-experiments).

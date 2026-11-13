@@ -24,7 +24,7 @@ def test_dashboard_empty():
 def test_dashboard_import():
     with patch('streamlit.file_uploader', return_value=Upload()):
         app = AppTest.from_file(str(DASHBOARD)).run()
-        app.radio(key='workbench_page').set_value('Vehicle data').run()
+        app.button_group(key='workbench_page').set_value('Vehicle data').run()
     assert not app.exception
     assert not app.error
     assert len(app.dataframe[0].value) == 4

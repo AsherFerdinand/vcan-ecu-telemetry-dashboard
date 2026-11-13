@@ -12,6 +12,8 @@ PAGES=['Overview','Frame Laboratory','Virtual CAN Network','Fault Investigation'
 
 
 def open_page(page,source=None):
+    from .studio_dashboard import pause_players
+    pause_players()
     st.session_state['workbench_page']=page
     if source:st.session_state['data_source']=source
 
@@ -60,11 +62,13 @@ def frame_lab():
     st.caption('Offline teaching definitions. KUKSA speed is derived from the documented DBC; other examples use authored synthetic definitions. No external dataset is needed.')
     st.session_state.setdefault('frame_id',EXAMPLE_ID)
     st.session_state.setdefault('frame_payload',EXAMPLE_PAYLOAD)
+    diagram_slot=st.container()
     left,right=st.columns([2,3])
     with left:
         st.subheader('01 / Configure')
-        identifier=st.text_input('Arbitration ID (hex)',key='frame_id')
-        payload=st.text_input('Payload bytes (hex)',key='frame_payload')
+        from .studio_dashboard import ID_HELP
+        identifier=st.text_input('Arbitration ID (hex) ⓘ',key='frame_id',help=ID_HELP)
+        payload=st.text_input('Payload bytes (hex) ⓘ',key='frame_payload',help='The payload contains message data bytes. Edit 0–8 hexadecimal byte pairs to change the classical frame. DBC decoding separately requires its defined DLC.')
         try:
             db=teaching_database();message=db.get_message_by_frame_id(int(identifier,16))
             options=[signal.name for signal in message.signals]
@@ -73,6 +77,9 @@ def frame_lab():
         selected=st.selectbox('DBC signal',options,key='frame_signal')
         st.caption('Examples: 0x257 speed; 0x100 original RPM/speed; 0x200 temperature; 0x300 signed Motorola teaching signal.')
         st.button('Reset verified example',key='frame_reset',on_click=reset_frame)
+    with diagram_slot:
+        from .studio_dashboard import frame_diagram
+        frame_diagram(identifier,payload)
     # Recompute on every valid input change. Button makes the workflow explicit;
     # nothing is retained from an older payload after an invalid edit.
     with right:
@@ -85,7 +92,8 @@ def frame_lab():
         a,b=st.columns(2)
         a.metric('Raw integer',result['raw_integer'])
         b.metric(f"Physical ({result['unit']})",f"{result['physical']:.6g}")
-        st.caption(f"Scale: {result['scale']} · Offset: {result['offset']}")
+        st.caption(f"Start bit ⓘ {result['start_bit']} · Length {result['length']} · {result['byte_order']}",help='DBC Intel start is the least significant signal bit; Motorola start is the most significant signal bit with sawtooth byte crossing. These are signal positions inside payload bytes, not frame wire positions.')
+        st.caption(f"Scale: {result['scale']} · Offset: {result['offset']}",help='ⓘ Physical = raw × factor + offset. Start bit comes from the DBC and depends on Intel/Motorola traversal; inspect its position below.')
         st.code(f"{result['raw_integer']} × {result['scale']} + ({result['offset']}) = {result['physical']:.6g} {result['unit']}")
         if result['frame_id']==0x257 and result['signal']=='DI_vehicleSpeed' and result['payload_hex']==EXAMPLE_PAYLOAD and math.isclose(result['physical'],3.04,abs_tol=1e-10):
             st.success('Known byte vector matches the manual 3.04 km/h interpretation check.')
@@ -142,7 +150,7 @@ def network_preset():
     st.session_state.pop('_network_result',None)
 
 
-def network_lab():
+def release_lab():
     st.markdown('<div class="vcan-kicker">CAN LABORATORY / VIRTUAL TRANSPORT</div>',unsafe_allow_html=True)
     st.header('Virtual CAN Network')
     st.write('Configure educational publishers and observe deterministic message arrivals at a shared receiving node. These are not actual KUKSA ECUs.')
@@ -156,7 +164,7 @@ def network_lab():
                 st.subheader(node.name)
                 enabled=st.checkbox('Transmit',True,key=f'node_enabled_{index}')
                 identifier=st.text_input('Standard ID (hex)',f'0x{node.frame_id:03X}',key=f'node_id_{index}')
-                period=st.number_input('Period (ms)',10,2000,node.period_ms,10,key=f'node_period_{index}')
+                period=st.number_input('Period (ms) ⓘ',10,2000,node.period_ms,10,key=f'node_period_{index}',help='How often this educational ECU attempts a logical release. It does not include physical arbitration delay or wire occupancy.')
                 phase=st.number_input('First release (ms)',0,2000,index*10,10,key=f'node_phase_{index}')
                 payload=st.text_input('Optional payload override (hex bytes)',key=f'node_payload_{index}')
                 nodes.append((node.name,identifier,period,enabled,re.sub(r'\s','',payload) if payload else None,phase))
@@ -207,6 +215,12 @@ def fault_lab():
         result,evidence,scenario=st.session_state['_fault_result']
         st.subheader('Observe: configured ground truth')
         st.json({'scenario':scenario,'nodes':result['nodes'],'injection':result['ground_truth']})
+        normal=network([Node('Powertrain ECU',0x100,result['nodes'][0]['period_ms'])],duration_ms=1500)
+        a,b=st.columns(2)
+        for column,label,experiment in ((a,'Normal operation',normal),(b,'Injected operation',result)):
+            with column:
+                st.caption(label+' · scheduled arrivals')
+                st.altair_chart(alt.Chart(pd.DataFrame(experiment['events'])).mark_tick(size=25).encode(x=alt.X('timestamp_ms:Q',title='Logical ms'),tooltip=['timestamp_ms','payload_hex']),width='stretch')
         frame=pd.DataFrame(result['events'])
         st.altair_chart(alt.Chart(frame).mark_line(point=True).encode(x=alt.X('timestamp_ms:Q',title='Logical timestamp (ms)'),
             y=alt.Y('speed_kmh:Q',title='Original synthetic speed (km/h)'),tooltip=['index','timestamp_ms','speed_kmh']),width='stretch')
@@ -235,6 +249,10 @@ def reset_quiz():
 def learn_can():
     st.markdown('<div class="vcan-kicker">LEARN CAN / LOCAL KNOWLEDGE LABORATORY</div>',unsafe_allow_html=True)
     st.header('Learn CAN')
+    from .studio_dashboard import differential_lab,pause_players
+    topic=st.segmented_control('Learning view',['FAQ & Quiz','Differential signalling'],default='FAQ & Quiz',required=True,key='learning_view',on_change=pause_players)
+    if topic=='Differential signalling':
+        differential_lab();return
     faq,quiz=st.tabs(['Fundamentals & FAQ','Knowledge Check'])
     with faq:
         if st.session_state.get('learn_topic'):st.info('Context from your experiment: '+st.session_state['learn_topic'])
@@ -264,3 +282,13 @@ def learn_can():
             for question,item in zip(questions,result['feedback']):
                 st.write(('✓ Correct' if item['correct'] else '○ Unanswered' if not item['answered'] else '× Review')+' · '+question['category'])
                 st.caption(item['explanation'])
+
+
+def network_lab():
+    from .studio_dashboard import vehicle_lab,arbitration_lab,pause_players
+    view=st.segmented_control('Network view',['Vehicle topology','Release experiment','Arbitration'],default='Vehicle topology',required=True,key='network_view',on_change=pause_players)
+    if view=='Vehicle topology':
+        st.header('Vehicle CAN network')
+        vehicle_lab(st.session_state.get('_network_result'))
+    elif view=='Arbitration':arbitration_lab()
+    else:release_lab()

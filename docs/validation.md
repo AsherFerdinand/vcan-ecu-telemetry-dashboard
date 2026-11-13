@@ -698,3 +698,112 @@ outputs stayed at 484,212 bytes. The packaged teaching example was also decoded
 successfully directly from the built wheel with isolated Python import paths
 (raw 538, 3.04 km/h), without an external DBC or a new environment. Exact working
 content-byte counts can be reproduced with `can-lab storage-audit` at this revision.
+
+## v0.4.6 Visual CAN Engineering Studio — 2026-11-13
+
+Started at `a5f783b6ec57c804303f6d0060b95304a78b24b4` on the existing workbench
+branch. New work is isolated on `feat/visual-can-engineering-studio`. No reference
+images were accessible beyond the pasted descriptions; no inaccessible illustration
+was claimed as inspected. All new field/arbitration/vehicle diagrams are original
+HTML/CSS/SVG driven by calculated values or explicitly scoped simulation data.
+
+### Implemented scope and evidence
+
+- Compact native segmented navigation replaces sidebar workspace radio controls.
+  Original CAN, workbook quality, replay, engineering, reports, fault scenarios,
+  FAQ and quiz remain accessible. Baseline navigation tests were adapted to the
+  new control and release-experiment subview; none of the 324 existing test cases
+  or their engineering assertions was removed.
+- Standard 11-bit classical **data** frames expose SOF, identifier, RTR, IDE, r0,
+  DLC, Data, CRC, delimiters, ACK and EOF, with following intermission explicitly
+  outside the frame. DLC 0–8 is derived from actual payload length. The separate
+  cantools DBC inspector retains its own required message length and still computes
+  raw 538 → 3.04 km/h; changed payload computes 3.12 km/h.
+- CRC-15/CAN uses 0x4599, initial/final XOR zero, no reflection, MSB-first unstuffed
+  SOF through Data. Catalogue check `123456789` → 0x059E passes. Independently
+  specified frame vectors: empty ID 0 → 0x0000; ID 0x123 / `11223344` → 0x11DA;
+  ID 0x257 / `38AD21030E000000` → 0x04CD. A distinct polynomial-long-division
+  calculation checks those remainders and appending CRC gives zero residue.
+  Stuffing tests cover complementary insertion, inserted bits participating in run
+  counting, source reconstruction and final-boundary insertion. Delimiters, ACK,
+  EOF and intermission are outside that stuffed region. ACK is simulated link-layer
+  receiver response, not application acceptance; ACK errors/retries are unmodelled.
+- Actual wired-AND identifier arbitration withdraws recessive transmitters that
+  observe dominant. Of 0x120, 0x124 and 0x3E0, cluster loses at identifier bit 9,
+  BMS at bit 2 and 0x120 wins. Duplicate and unsupported IDs fail explicitly.
+  This does not add physical occupancy/latency to the existing release scheduler.
+- Differential illustration computes nominal single-ended levels and Vdiff for
+  logical bits; equal deterministic common-mode noise cancels to floating-point
+  precision. It does not model receiver range, asymmetry, real EMC or every CAN
+  physical layer. Original/disturbed lines and logical/dominant state are inspectable.
+- Vehicle SVG uses one paired segment, two end terminations, four existing-model
+  publishers and passive Brake ECU. Dashed local motor/battery/sensor links do not
+  create extra CAN nodes. Per-ECU reception is modeled broadcast observability;
+  the existing single python-can observer validates actual frame delivery. No
+  acceptance filters, separate receiver queues, gateways or production firmware
+  are claimed. Frame index, payload, timestamp, DLC, supported synthetic decoding
+  and modeled receivers follow the retained event. Other message IDs remain raw.
+- Start/Pause/Previous/Step/Reset operate a bounded playhead, never random animation
+  events. Native fragments run only during play, stop at the buffer end and pause
+  on navigation. Manual reduced-motion mode disables automatic play; CSS also
+  honours OS reduced-motion preference. ECU/bus click or keyboard inspection is
+  isolated in one HTML component; its JavaScript only selects the local info panel.
+  Pause to read that panel: changing the current event rebuilds it.
+- Fault Investigation preserves its existing injection and evidence model and now
+  compares normal/injected arrivals side by side. These educational thresholds are
+  not the planned v0.5 evaluated detector or a confirmed hardware-fault diagnosis.
+
+### Verification
+
+Full dataset-free suite: **366 passed, 1 skipped**, 19.78 s in this execution.
+The optional external KUKSA integration was separately enabled using retained
+inputs: **1 passed**, 2.45 s; no dataset download was needed. Existing synthetic
+virtual-CAN demo processed **20 samples, zero flagged**. `pip check` passed;
+locked dependencies are unchanged. The offline local-link/heading checker passed.
+
+Installed Linux Chromium/Playwright exercised the running app at 1024×768 and
+1440×1080. Verified frame/CRC display, reactive payload decoding, component
+keyboard and pointer inspection, real automatic fragment playback, pause stable
+beyond two timer periods, reset, arbitration loss stepping, differential/noise
+controls and disabled automatic play in manual reduced-motion mode. There were
+no browser page errors or Streamlit exception blocks, and no document horizontal
+overflow on the frame or vehicle views at laptop width. Server health returned
+`ok`. A single actual topology-component screenshot was deliberately captured for
+[the guide](workbench.md#visual-studio-experiments); historical screenshots remain.
+This is targeted browser verification, not a formal accessibility or native
+Windows/macOS validation claim.
+
+### Performance, storage and remaining work
+
+Existing retention cap remains **4004 events**. One measured maximum-size schedule
+ran in **74.46 ms** here; that is an observation, not a cross-platform performance
+guarantee or real-time bus benchmark. Playback is capped at **4.00 items/s** and
+uses original logical timestamps without inventing physical wire delays. No
+background timer continues while paused. No new runtime dependency, new environment,
+large frontend framework, research archive, plot export or persistent cache was added.
+
+Starting tracked content was **0.76 MB**; existing ignored generated outputs remain
+**484.21 KB** across 29 files. The only new binary evidence is a deliberately captured
+studio screenshot, **38.50 KB**. Exact audit byte counts and manifest/output hashes
+remain integers internally; human-facing CLI/UI/script size summaries now select
+decimal units and round to two decimals. Source/DBC verification and machine JSON
+are unchanged. No datasets or temporary simulation outputs were staged, and no
+historical evidence was deleted. The read-only audit provides the final revision's
+tracked content measurement without treating `.git` or environments as source.
+
+Deferred boundaries: wire timing/occupancy, errors/retries, transmission-line/EMC
+solving, production ECU firmware, full sensor physics, per-node receive queues,
+gateways and independent physical validation. Native Windows testing must check
+the locked install, browser/fragment timing, SVG focus/keyboard controls, 1024×768
+layout, OS reduced motion and the existing CAN/Excel workflows. Learner usability
+and assistive-technology review are recommended before expanding scope. The KUKSA
+physical-reference/acquisition evidence gate remains pending.
+
+A built `0.4.6.dev0` wheel was also checked with isolated Python imports: the
+packaged offline DBC still decodes raw 538 and the frame model calculates CRC
+0x04CD, without external vehicle data or a second environment.
+
+The staged revision's read-only inventory contained 104 tracked files totaling
+approximately **0.85 MB**, including the new **38.50 KB** screenshot. Historical
+ignored outputs remained **484.21 KB**. No new runtime dependency was introduced;
+the verification wheel was **107.16 KB** and remained outside Git.

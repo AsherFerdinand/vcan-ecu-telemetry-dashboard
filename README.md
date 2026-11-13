@@ -48,20 +48,20 @@ frames and three manual byte checks. The [raw CAN guide](docs/raw_can_validation
 retains the original candidate assessments and evidence boundaries.
 Rules and thresholds remain screening heuristics, not a validated anomaly detector.
 
-## Interactive Engineering Workbench (v0.4.5)
+## Visual CAN Engineering Studio (v0.4.6)
 
-The Streamlit frontend now combines a navy sidebar, light workspace and compact
-module cards with three deterministic experiences: **Frame Laboratory** (live
-payload/bit/scaling inspection), **Virtual CAN Network** (configurable logical
-releases over existing virtual transport), and **Fault Investigation** (known
-synthetic timing, silence and signal-step events). **Learn CAN** adds 20 FAQ topics
-and a scored, explained local quiz. Existing data, replay, diagnostics and reports
-remain under **Vehicle data → Existing data workflows**.
+A compact tab-style navigation bar connects the existing workflows with an
+interactive **standard CAN frame** (calculated CRC-15 and bit stuffing), **bitwise
+arbitration**, an ideal **CAN_H/CAN_L common-mode experiment**, and an original
+**vehicle topology** driven by retained deterministic events. Start, Pause, Step,
+Reset and reduced-motion controls make the data inspectable; no random animation
+or hardware validation is implied.
 
-The offline speed example decodes raw 538 to **3.04 km/h**; editing its payload
-recalculates the result. Teaching simulations are separate from real-data evidence.
-See the [quick guide and actual screenshots](docs/workbench.md) for controls,
-assumptions and the distinction between DBC interpretation and physical accuracy.
+The offline DBC example still computes raw 538 → **3.04 km/h**. Original CAN,
+telemetry, replay, engineering, fault scenarios, FAQ and quiz remain accessible.
+See the [studio guide and actual screenshots](docs/workbench.md) for controls,
+protocol conventions and limitations. Identifier arbitration is separate from
+network scheduling; wire timing, error/retry handling and EMC are not simulated.
 
 ## Engineering architecture
 
@@ -148,6 +148,7 @@ are in the [dataset guide](docs/real_world_telemetry.md) and [validation record]
 | v0.3 | Implemented foundation | Synthetic CAN, decoded EV telemetry, deterministic diagnostics, UI/reports |
 | v0.4 | Synthetic-validated foundation; real-data gate blocked | 10,000 source-reported vehicle frames decoded (Level 2); provenance caveats and independent physical validation outstanding |
 | v0.4.5 | Interactive workbench implemented | Synthetic learning experiments; source-qualified data workflows retained |
+| v0.4.6 | Visual studio implemented | Calculated frame/CRC, arbitration, ideal differential illustration and event playback |
 | v0.5 | Planned | Evaluated event/anomaly detection, including message timing |
 | v0.6 | Planned | Forecasting baselines and chronological held-out evaluation |
 | v0.7 | Planned | Read-only, evidence-based AI tool orchestration with human review |
@@ -158,7 +159,7 @@ v0.4 is a foundation/pre-release, not a completed real-data milestone; v0.5–v0
 
 ## Validation and testing
 
-**324 automated tests passed** in this revision, retaining all 276 preceding tests; one external-data test is
+**366 automated tests passed** in this revision, retaining all 324 preceding tests; one external-data test is
 skipped by default and passed separately against the pinned KUKSA inputs. Coverage includes independent synthetic CAN vectors, virtual transport,
 imports, uncertainty, engineering calculations, replay, exports and dashboard
 integration. The latest executed environment/platform checks are recorded in
@@ -169,7 +170,7 @@ requires no AI service, internet connection, cloud platform or private dataset.
 ## Quick start
 
 Requires Git and **Python 3.12**. This revision is on
-`feat/interactive-engineering-workbench`; the validated v0.3 branch is preserved.
+`feat/visual-can-engineering-studio`; the validated v0.3 branch is preserved.
 The version lock includes Streamlit and Excel/test dependencies. It was produced
 for Python 3.12 on Linux; it is not an artifact-hash or native-Windows validation claim.
 
@@ -180,7 +181,7 @@ No virtual-environment activation or execution-policy change is required.
 
 ```powershell
 New-Item -ItemType Directory -Force C:\Projects | Out-Null
-git clone --branch feat/interactive-engineering-workbench https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git C:\Projects\CAN-Lab-v0.4.5
+git clone --branch feat/visual-can-engineering-studio https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git C:\Projects\CAN-Lab-v0.4.5
 Set-Location C:\Projects\CAN-Lab-v0.4.5
 py -3.12 -m venv .venv
 & .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
@@ -220,7 +221,7 @@ Linux SocketCAN details remain in [Workflows](docs/WORKFLOWS.md#local-can-reprod
 ## Raw CAN and storage reproduction
 
 The [executed KUKSA investigation](docs/kuksa_investigation.md#reproduce-without-a-large-archive)
-uses a 9.2 MB public example plus a 322 KB bundled DBC outside Git, not the large
+uses a 9.21 MB public example plus a 322.43 KB bundled DBC outside Git, not the large
 compressed capture. Three manual DBC interpretation checks pass; no calibrated
 physical reference is claimed. The capture/date/licensing limitations are explicit.
 
@@ -254,7 +255,7 @@ retention, safe output paths, backup responsibilities and resource bounds.
 
 ## Visual evidence and limitations
 
-Two small [actual workbench screenshots](docs/workbench.md#actual-application-screenshots)
+Historical workbench and current studio [actual screenshots](docs/workbench.md#actual-application-screenshots)
 are retained as documentation evidence. They show the running Linux browser UI,
 not physical vehicle validation or fabricated mockups.
 

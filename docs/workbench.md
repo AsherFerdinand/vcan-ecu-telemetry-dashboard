@@ -1,7 +1,7 @@
-# Interactive Automotive Engineering Workbench — v0.4.5
+# Visual CAN Engineering Studio — v0.4.6
 
-The existing Streamlit application now opens on **Overview**, with dark navy
-navigation, a light workspace, restrained orange accents, technical labels and
+The existing Streamlit application now opens on **Overview**, with a compact tab-style
+navigation bar and dark navy branding, a light workspace, restrained orange accents, technical labels and
 compact module cards. Configure → Run → Observe → Investigate → Explain guides
 each experiment. This is the same application and analysis stack, not another
 frontend. No account, network dataset, AI API or new runtime dependency is needed.
@@ -16,8 +16,8 @@ Install the locked environment as in the README, then run from the repository ro
 python -m streamlit run src/can_lab/dashboard.py --server.headless true
 ```
 
-1. Open an Overview card or use the sidebar **Workspace** radio controls.
-2. Choose **Vehicle data**, then expand **Existing data workflows** in the sidebar
+1. Open an Overview card or use the horizontal **Workspace** navigation bar.
+2. Choose **Vehicle data**, then expand **Existing data workflows** above the workspace
    to select the original virtual ECU sample, synthetic candump/canonical imports,
    raw-CAN investigation or EV workbook analysis.
 3. Existing workbook quality, synchronized plots, replay, engineering diagnostics
@@ -28,6 +28,79 @@ Native controls retain keyboard operation and focus outlines. Bit highlights use
 underlines as well as colour, and an accessible table includes every byte and
 selected bit number. The layout was inspected at 1440×1080 and 1024×768 in Linux
 Chromium. This is not a formal accessibility audit or native Windows/macOS test.
+
+## Visual studio experiments
+
+**CAN Frame Lab:** The field diagram is above the signal inspector. Enter a standard
+11-bit ID and 0–8 payload bytes. DLC is derived from the actual payload length;
+DBC decoding separately enforces its message length. Thus a shorter valid CAN
+frame can be visualized while its eight-byte DBC signal correctly refuses decoding.
+Select a field or hover its tile for rules, length and current bits. Intermission
+is visibly separate and follows EOF. Only standard classical **data** frames are
+implemented; no remote, extended, FD, error or overload frame variants are implied.
+
+Advanced view calculates **CRC-15/CAN** over unstuffed SOF through Data, including
+identifier, RTR, IDE, r0 and DLC. Polynomial is 0x4599 (x^15 implicit), initial and
+final XOR zero, no reflection, MSB-first input. Stuffing then covers SOF through the
+CRC sequence: insert a complement after five consecutive identical transmitted
+bits. Inserted bits participate in subsequent run counting; CRC excludes them.
+Delimiters, ACK, EOF and intermission are unstuffed. The known KUKSA-derived payload
+has CRC 0x04CD and seven stuff bits under these explicit conventions. The check
+string `123456789` gives 0x059E; separate polynomial division checks frame vectors.
+
+The supported unstuffed field lengths are **1, 11, 1, 1, 1, 4, 0–64, 15, 1, 1, 1,
+7** for SOF through EOF. Intermission contributes a further 3 bits after the frame.
+A transmitter sends recessive in the ACK slot; the checkbox models a correctly
+receiving peer driving dominant. ACK is not application acceptance or hardware
+capture evidence. Missing-ACK errors/retries are not simulated. Native help icons
+explain IDs, payloads, DLC, periods, DBC start bits and scaling.
+
+**Vehicle Network → Arbitration:** Three standard data-frame contenders default to
+0x120, 0x124 and 0x3E0. At each identifier bit (MSB first), the bus is the wired-AND
+of active transmitters. A recessive transmitter observing dominant withdraws.
+The cluster loses at identifier bit 9, BMS at bit 2, and 0x120 wins. Step backward,
+forward, play or reset to inspect the calculation. Losing arbitration is normal,
+not an error. Duplicate IDs are rejected. This lab computes actual identifier
+competition; it does **not** add occupancy/latency to the separate release scheduler.
+
+**Learn CAN → Differential signalling:** Play or step through a bounded binary
+sequence. Step-after charts show original and disturbed CAN_H/CAN_L plus Vdiff.
+Illustrative nominal levels are recessive 2.5/2.5 V (logical 1) and dominant 3.5/1.5 V
+(logical 0). An identical deterministic sinusoidal common-mode disturbance of
+0.00–1.00 V amplitude is added to both lines; subtraction cancels it in this ideal
+model. Receiver range, asymmetric coupling, signal integrity and real EMC immunity
+are outside scope. These are illustrative levels, not universal fixed voltages.
+
+**Vehicle Network → Vehicle topology:** The original SVG depicts one paired CAN
+segment with two end 120-ohm terminations. Four publishers and a passive Brake ECU
+observe that segment; wheel sensing connects locally to Brake ECU, battery sensing
+to BMS and motor power/control locally to its controller. Sensors/power components
+are not extra CAN nodes. Publisher messages come from the original deterministic
+network experiment, not random animation. Custom release experiments can also feed
+the view. A single python-can observer validates event delivery; per-ECU receipt is
+modeled broadcast observability, not separate receiver queues or hardware ACK.
+There are no acceptance filters, extra segments or gateways.
+
+Start/Pause/Previous/Step/Reset select an original retained event. Payload, DLC,
+logical timestamp, transmitter, modeled receivers and original synthetic decoded
+signals are inspectable. Other IDs remain uninterpreted; no unrelated teaching DBC
+is silently applied. Click or keyboard-activate an ECU/bus inside the isolated HTML
+component to inspect its role, messages and periods. The pulse denotes the selected
+actual event, not propagation velocity. Termination and differential signalling
+have contextual explanations. Disable transmission affects publishing, not the
+assumed ability to observe broadcast traffic.
+
+Playback advances **one retained item per timer tick**, at 0.50–4.00 items/s; it is
+not a real-time replay clock or a wire model. Native Streamlit fragments run at a
+bounded interval only while playing, stop at the buffer end and pause on navigation.
+Manual reduced-motion mode disables automatic playback and CSS motion also respects
+`prefers-reduced-motion`. The core's maximum 4004-event retention is unchanged.
+Fault Investigation adds normal/injected arrival timelines side by side using the
+same generator, while preserving all previous threshold evidence and source events.
+
+Current actual Linux Chromium capture (historical v0.4.5 screenshots follow below):
+
+![Visual studio vehicle topology driven by the retained deterministic event](images/studio-vehicle.jpg)
 
 ## Frame Laboratory
 
@@ -115,7 +188,7 @@ identity collection or uploaded scores.
 
 ## Actual application screenshots
 
-These two small JPEGs were captured from the running Linux Chromium application,
+These two historical v0.4.5 JPEGs were captured from the running Linux Chromium application,
 not generated mockups. Capture is deliberate documentation evidence; the app does
 not export screenshots, plot images or ZIPs during normal use.
 

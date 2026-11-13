@@ -7,7 +7,7 @@ import argparse
 from collections import Counter
 import json
 from pathlib import Path
-from can_lab.artifacts import build_manifest, generated_output
+from can_lab.artifacts import build_manifest, generated_output, format_size
 from can_lab.can_recording import CANConfig, investigate_candump, check_references
 from can_lab.can_reports import export_can_json, export_can_markdown, signal_summary
 from can_lab.engineering import analyze_engineering
@@ -66,7 +66,7 @@ def investigate(data_directory, output_prefix, output_root):
     with paths['.manifest.json'].open('x',encoding='utf-8') as stream:
         json.dump(run,stream,indent=2,sort_keys=True,allow_nan=False);stream.write('\n')
     print(json.dumps({'coverage':result.coverage,'passed':result.validation['passed'],
-                      'physical_accuracy':'not_established','output_bytes':sum(path.stat().st_size for path in paths.values())}))
+                      'physical_accuracy':'not_established','output_size':format_size(sum(path.stat().st_size for path in paths.values()))}))
     return result,summary
 
 

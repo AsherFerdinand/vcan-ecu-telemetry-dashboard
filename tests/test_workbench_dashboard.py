@@ -7,15 +7,16 @@ DASHBOARD=Path(__file__).parents[1]/'src/can_lab/dashboard.py'
 
 def workspace(page):
     app=AppTest.from_file(str(DASHBOARD)).run()
-    app.radio(key='workbench_page').set_value(page).run()
+    app.button_group(key='workbench_page').set_value(page).run()
     assert not app.exception
+    if page=='Virtual CAN Network':app.button_group(key='network_view').set_value('Release experiment').run()
     return app
 
 
 def test_overview_and_card_navigation():
     app=AppTest.from_file(str(DASHBOARD)).run()
     assert not app.exception
-    assert app.radio(key='workbench_page').value=='Overview'
+    assert app.button_group(key='workbench_page').value=='Overview'
     assert len([button for button in app.button if button.label.startswith('Open ')])==6
     app.button(key='open_Frame LaboratoryNone').click().run()
     assert not app.exception and app.session_state['_frame_result']['raw_integer']==538
@@ -40,7 +41,7 @@ def test_motorola_lab_and_contextual_learning():
     assert not app.exception
     assert app.session_state['_frame_result']['bits']==[3,2,1,0,15,14,13,12,11,10,9,8]
     app.button(key='frame_learn').click().run()
-    assert not app.exception and app.radio(key='workbench_page').value=='Learn CAN'
+    assert not app.exception and app.button_group(key='workbench_page').value=='Learn CAN'
     assert len(app.expander)>=20
 
 

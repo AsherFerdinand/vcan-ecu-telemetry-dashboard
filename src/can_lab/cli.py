@@ -102,8 +102,8 @@ def main(argv=None):
             from .can_cli import run
             return run(args)
         if args.command == 'storage-audit':
-            from .artifacts import audit_storage
-            print(json.dumps(audit_storage(args.repository_root,output_root=args.output_root),indent=2))
+            from .artifacts import audit_storage,display_sizes
+            print(json.dumps(display_sizes(audit_storage(args.repository_root,output_root=args.output_root)),indent=2))
             return 0
         if args.command in ('analyze-xlsx', 'report-xlsx'):
             from .workbook_cli import analyze

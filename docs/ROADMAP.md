@@ -9,6 +9,7 @@ behaviour. Company inspirations in [Workflows](WORKFLOWS.md) are not affiliation
 | v0.3 | Implemented foundation | Reproducible synthetic CAN and decoded-telemetry checks |
 | v0.4 | Implemented foundation, synthetic-validated; real-data gate blocked | Independent real-recording / matching-DBC validation |
 | v0.4.5 | Interactive workbench implemented | Offline teaching experiments, quiz and existing data workflows; independent physical evidence remains pending |
+| v0.4.6 | Visual studio implemented | Standard frame/CRC, wired-AND identifier arbitration, ideal differential illustration, bounded event-driven topology |
 | v0.5 | Planned | Measured event/anomaly detection performance |
 | v0.6 | Planned | Chronological held-out forecasting evaluation |
 | v0.7 | Planned | Logged, human-reviewed AI tool orchestration compared with scripted automation |
@@ -73,6 +74,17 @@ reuses existing codec, simulation and engineering workflows. See the
 [workbench guide](workbench.md) for tested controls and limits. These educational
 thresholds do not meet or replace the v0.5 detector evaluation gate below. No new
 physical-accuracy claim follows from the interface or quiz.
+
+## v0.4.6 — Visual CAN engineering studio
+
+Implemented: compact navigation, calculated standard classical data-frame fields,
+CRC/stuffing, a separately scoped bitwise arbitration lab, ideal differential/noise
+illustration, and event-driven SVG topology with bounded native playback. Previous
+experiments and data tools remain available. Frame correctness does not establish
+wire timing, EMC performance, hardware accuracy or production diagnostics. Brake ECU
+is initially a passive observer; full firmware, receive queues, electrical/transmission
+line solving, bus occupancy/error/retry timing and gateway networks are deferred.
+Native Windows browser validation and human accessibility review remain needed.
 
 ## v0.5 — Automated event and anomaly detection
 
