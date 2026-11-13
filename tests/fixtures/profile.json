@@ -1,0 +1,4 @@
+{
+  "columns": {"time_ms": "timestamp_s", "velocity": "speed_kmh", "soc": "soc_pct", "current": "battery_current_a", "temp": "battery_temperature_c"},
+  "units": {"timestamp_s": "ms", "speed_kmh": "m/s", "soc_pct": "fraction", "battery_current_a": "A_charge_positive", "battery_temperature_c": "K"}
+}

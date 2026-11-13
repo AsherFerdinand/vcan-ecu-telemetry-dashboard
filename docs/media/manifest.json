@@ -1,0 +1,59 @@
+{
+  "schema": "vcan-portfolio-assets-1",
+  "application_git_commit": "027f7e357f4d1815a2cac8a16d062b3aa3364e38",
+  "application_source_tree": "f0aec4977a463a275e9532122ca5432271ab0dd5",
+  "browser": "Chromium 154.0.8037.57",
+  "ffmpeg": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "method": "Native Playwright WebM recording; actual UI actions/assertions; setup trimmed; FFmpeg 12 FPS sampling, near-identical-frame coalescing with source timestamps, 96-color palette, no dithering. No synthetic UI frames, caption overlays or injected calculation values.",
+  "engineering_scope": "Same v0.4.7 application; schematic network motion, DBC interpretation only, no hardware/physical validation.",
+  "assets": [
+    {
+      "asset": "frame-laboratory.gif",
+      "width": 1120,
+      "height": 960,
+      "frames": 31,
+      "duration_s": 10.67,
+      "sampling_fps": 12,
+      "timing": "Variable GIF delays preserve source PTS after near-identical-frame suppression",
+      "bytes": 1796870,
+      "sha256": "17378562ecc21e1de3d470374e108a72a98565faf9679502f1c7489af437a4d1",
+      "loop": 0,
+      "raw_clip_start_s": 4.611,
+      "raw_clip_duration_s": 10.671,
+      "raw_sha256": "83cb2ce03f7f8f73ec8b776ad20f0ecb70f6b4a45c5401203555b7ec4f3fcd61",
+      "raw_bytes": 1194295
+    },
+    {
+      "asset": "vehicle-network.gif",
+      "width": 1120,
+      "height": 960,
+      "frames": 97,
+      "duration_s": 12.48,
+      "sampling_fps": 12,
+      "timing": "Variable GIF delays preserve source PTS after near-identical-frame suppression",
+      "bytes": 2471941,
+      "sha256": "d7c0678bf14c4dae99664b8e7d754e4535ed0ae81e005964039b7ed98c54be46",
+      "loop": 0,
+      "raw_clip_start_s": 2.388,
+      "raw_clip_duration_s": 12.48,
+      "raw_sha256": "6e2c6542c3ed162abb9d215284ec963432741406e2228bbfab869fa9118bb066",
+      "raw_bytes": 1153624
+    },
+    {
+      "asset": "can-arbitration.gif",
+      "width": 1120,
+      "height": 960,
+      "frames": 30,
+      "duration_s": 13.62,
+      "sampling_fps": 12,
+      "timing": "Variable GIF delays preserve source PTS after near-identical-frame suppression",
+      "bytes": 2422308,
+      "sha256": "bb00071a5a5cc2dd256075e0a7dfd71713ade5e1acec7228571d61a6866637a2",
+      "loop": 0,
+      "raw_clip_start_s": 2.377,
+      "raw_clip_duration_s": 13.62,
+      "raw_sha256": "32359a8e20b785357848dba4277f6d6528d19b46f3a905184aa680da49967c17",
+      "raw_bytes": 1500733
+    }
+  ]
+}

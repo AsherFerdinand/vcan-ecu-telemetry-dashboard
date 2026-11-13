@@ -1,0 +1,4 @@
+[
+  {"timestamp_s": 0, "source": "synthetic-fixture", "speed_kmh": 0, "rpm": 1000, "soc_pct": 80},
+  {"timestamp_s": 1, "source": "synthetic-fixture", "speed_kmh": 36, "rpm": 2000, "soc_pct": 79.9}
+]

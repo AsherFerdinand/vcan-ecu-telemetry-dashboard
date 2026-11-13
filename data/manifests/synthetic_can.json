@@ -1,0 +1,24 @@
+{
+  "schema": "vcan-source-manifest-1",
+  "source": {
+    "dataset_id": "VCAN synthetic CAN example",
+    "url": "https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard/blob/dev/v0.4-real-can-validation/tests/fixtures/raw_can/example.log",
+    "revision": "fixture at the source Git commit recorded in each run manifest",
+    "license": "MIT (scoped tests/fixtures/raw_can/LICENSE)",
+    "kind": "synthetic_fixture",
+    "compatibility_status": "synthetic by construction; not a real vehicle recording"
+  },
+  "dbc": {
+    "dataset_id": "VCAN synthetic demonstration DBC",
+    "url": "https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard/blob/dev/v0.4-real-can-validation/tests/fixtures/raw_can/example.dbc",
+    "revision": "fixture at the source Git commit recorded in each run manifest",
+    "license": "MIT (scoped tests/fixtures/raw_can/LICENSE)",
+    "kind": "synthetic_fixture",
+    "compatibility_status": "synthetic fixture definitions, not an OEM DBC"
+  },
+  "expected_hashes": {
+    "source": "cbe6817f24a109eeddf63b81426c91f8c61c57f307a9f786c2294080a0c1ceca",
+    "dbc": "718a1cba4f69bc50abbfe95769c0645cd32000d5f0c2b214ad69a3f7d05eac2b"
+  },
+  "evidence_status": "Validated by independent manual synthetic vectors only. Real recording/DBC physical validation remains blocked."
+}

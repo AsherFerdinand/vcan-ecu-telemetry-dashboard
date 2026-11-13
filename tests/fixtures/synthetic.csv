@@ -1,0 +1,5 @@
+timestamp_s,time_basis,source,speed_kmh,rpm,battery_voltage_v,battery_current_a,soc_pct,battery_temperature_c
+0,relative,synthetic-fixture,0,1000,400,0,80,25
+1,relative,synthetic-fixture,36,2000,398,50,79.9,26
+2,relative,synthetic-fixture,72,3000,395,100,79.8,27
+3,relative,synthetic-fixture,36,2000,402,-25,79.85,27

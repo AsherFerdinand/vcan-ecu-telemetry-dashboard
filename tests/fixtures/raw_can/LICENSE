@@ -1,0 +1,17 @@
+MIT License — applies only to the new VCAN-authored files in this directory.
+Copyright (c) 2026 VCAN contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of these synthetic fixture files and associated documentation, to deal in them
+without restriction, including the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies, and to permit persons to whom the
+files are furnished to do so, subject to the following condition:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the files.
+THE FILES ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THESE FILES.
+
+No third-party recording or vehicle DBC is included. This notice does not
+relicense pre-existing repository content or upstream datasets.

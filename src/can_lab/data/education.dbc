@@ -1,0 +1,8 @@
+VERSION "VCAN authored teaching definitions; NOT an OEM DBC. Speed bits/scale documented from KUKSA Model3CAN.dbc d54df533fc82f3dab11ddd0f5ae4d846f22c0a24b111d8cba2b93e79caf60151"
+NS_ :
+BS_:
+BU_: TeachingNode
+BO_ 599 KUKSASpeedTeaching: 8 TeachingNode
+ SG_ DI_vehicleSpeed : 12|12@1+ (0.08,-40) [-40|287.6] "km/h" TeachingNode
+BO_ 768 SignedTeaching: 8 TeachingNode
+ SG_ SignedExample : 3|12@0- (0.5,-10) [-1034|1013.5] "teaching units" TeachingNode

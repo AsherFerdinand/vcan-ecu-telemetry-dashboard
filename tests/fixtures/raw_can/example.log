@@ -1,0 +1,8 @@
+# VCAN-authored synthetic frames. Not a real vehicle recording.
+(0.000000) vcan0 120#D3021F4023000000
+(0.010000) vcan0 121#A00F06FF00000000
+(0.020000) vcan0 120#E803271028000000
+(0.030000) vcan0 777#0102030405060708
+(0.040000) vcan0 120#0000
+malformed input retained as an explicit report count
+(0.050000) vcan0 120#0000000028000000
