@@ -596,3 +596,20 @@ Reviewed source/license documents, original capture and any signed-off results n
 separate owner-managed retention/backups; Git contains only code, small configurations,
 synthetic tests and documentation. Run manifests retain their exact hashes and dirty
 state. This sprint follows the existing [retention policy](data_artifacts.md).
+
+### Clean-commit reproduction and final inventory
+
+Implementation commit `2eee856ee6ba911862fddc47ab5656fd7118b0bb` was investigated
+again with the same two external inputs (no second download). The clean manifest
+recorded that exact Git commit, `working_tree_dirty=false`, all three reference
+checks passing, and SHA-256 for each requested output. Four compact verified
+artifacts totalled 41,766 bytes. The earlier development artifacts were retained,
+not overwritten or deleted; they document a dirty-source exploratory run.
+
+At that implementation revision: **85 tracked files / 461,624 content bytes**.
+After the clean run: **29 ignored generated files / 484,212 bytes**. These figures
+exclude `.git`, environments and external research inputs, whose two-file size
+remains 9,530,318 bytes. No raw log, research DBC, workbooks, Parquet, archive or
+runtime output appears among staged changes. Ignore checks explicitly cover them;
+only scoped authored DBC fixtures are exceptions. The documentation-only follow-up
+records this execution and does not change tested numerical code.
