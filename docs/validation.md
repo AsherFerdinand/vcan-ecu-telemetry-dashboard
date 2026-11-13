@@ -905,3 +905,94 @@ Final staged tracked content is approximately **1.03 MB**, including the two new
 requested screenshots. Ignored historical outputs remain **484.21 KB**; no runtime
 dependency was added. The exact revision inventory is reproducible with the
 read-only storage audit.
+
+## v0.4.8 Portfolio README and automated demonstrations — 2026-11-13
+
+Starting application revision: `027f7e357f4d1815a2cac8a16d062b3aa3364e38`.
+New documentation branch: `feat/portfolio-readme-demonstrations`. The application
+remains v0.4.7: no files in `src/`, `.streamlit/`, `pyproject.toml` or the dependency
+lock were changed. Its source-tree object is
+`f0aec4977a463a275e9532122ca5432271ab0dd5`, also recorded in the asset manifest.
+The portfolio revision presents existing software; it adds no engineering feature,
+hardware validation, forecasting, AI agent or cloud gateway.
+
+### Actual capture and optimization
+
+The running Streamlit app was recorded with installed Playwright/Chromium and
+system FFmpeg, using real native controls. Setup selected Dark and applied the
+custom appearance. Three independent browser sessions used 1120×960 viewports and
+official embed mode to omit hosting chrome. Scroll changes are real viewport
+movements to make engineering results readable, not composited screenshots.
+Native browser WebM clips stayed outside Git.
+
+The first encode was about 18.95 MB combined and two views needed better framing.
+A second actual capture scrolled sensor details and the arbitration winner into
+view. Final conversion samples at 12 FPS, coalesces near-identical source frames
+while preserving presentation timestamps, uses a 96-colour palette without
+dithering, and retains the final actual hold via GIF timing. There are no generated
+UI states, interpolated signal values, synthetic pointer overlays or invented CAN
+packets. Static holds use longer GIF delays rather than redundant stored frames;
+whole-clip average frame count is therefore lower than active-motion sampling FPS.
+
+| Final recording | Dimensions | Stored frames | Duration | Size |
+| --- | --- | --- | --- | --- |
+| Frame Laboratory | 1120×960 | 31 | 10.67 s | 1.80 MB |
+| Vehicle Network | 1120×960 | 97 | 12.48 s | 2.47 MB |
+| CAN Arbitration | 1120×960 | 30 | 13.62 s | 2.42 MB |
+
+Total final GIF content: **6.69 MB**. Every GIF is below 5.00 MB; the frame clip
+was not padded to reach 2.00 MB. Only these optimized files, a compact exact-size/
+hash/source manifest and a small local SVG technology-label bar are publication
+assets. The existing genuine overview screenshot was reused as the hero; no
+additional or duplicate hero screenshot was committed.
+
+### Asset and engineering verification
+
+- `tools/verify_portfolio.py` decoded every frame and checked actual dimensions,
+  frame counts, positive delays, summed durations, looping and SHA-256 against the
+  manifest. Exact raw-capture hashes, sizes and trim intervals are retained as
+  machine metadata without private paths; original videos remain external.
+- Representative frames were visually inspected: first overview/opening, raw
+  538 / 3.04 km/h, changed AD→BD / 539 / 3.12 km/h, reset; cyan wire-following
+  pulses, actual TX/RX state, pause and visible FL sensor/local ABS context; both
+  losing arbitration states, the displayed 0x120 winner, and reset to bit 10.
+  Inspection caught and corrected offscreen details before publication.
+- Chromium loaded all three as ordinary static-page `<img>` elements at their
+  actual dimensions. Native painted pixels changed during GIF playback without a
+  JavaScript animation driver. Relative Markdown image paths and all local document
+  links/headings passed the offline checker. No credential, private dataset,
+  account information or browser profile appears in the recordings.
+- The automation asserted actual application outputs/states and checked for
+  JavaScript/Streamlit exceptions. No exceptions occurred. The server health
+  endpoint returned `ok`. GIF authenticity is supported by unchanged application
+  source, actual capture and inspected output—not encoding success alone.
+- Full engineering suite: **375 passed, 1 skipped**, 21.31 s. The skipped case is
+  the optional external-data integration; it was not needed or newly downloaded
+  for portfolio capture. Original virtual CAN demo: **20 samples, zero flagged**.
+  No tests were removed or weakened and no new application dependency was added.
+
+The README now prioritizes genuine demonstrations, concise capabilities, the
+implemented architecture, evidence levels, reproducible setup and limitations.
+All source/licensing attribution and detailed technical instructions remain linked.
+The [recording guide](portfolio_recording.md) documents the tooling workaround,
+Windows reproduction prerequisites and exact verified inventory. Playwright's
+missing recorder binary was supplied through a temporary path to existing system
+FFmpeg, without installing a browser or changing runtime requirements.
+
+Raw takes, larger candidate encodes, palettes/review PNGs, browser caches and the
+recording-tool shim remained outside Git. Historical source/data/report evidence
+was not deleted. The existing ignored output directory remains **484.21 KB**.
+Source/media growth is intentional documentation evidence, not a research-data
+bundle or repeated project archive. No main-branch merge was performed.
+
+Limitations remain unchanged: recordings demonstrate software/educational behaviour,
+not physical CAN timing, real ECU firmware, sensor calibration, production fault
+diagnosis or independent physical vehicle accuracy. Native Windows/macOS recording
+and GitHub's remote rendered page were not executed in this Linux environment;
+local relative paths, GIF decoding and native Chromium image playback were checked.
+
+The staged read-only inventory measured **7.74 MB** in
+116 tracked files, growth of **6.71 MB** from the starting
+revision. The **6.69 MB** GIF set accounts for nearly all growth; historical
+generated outputs remain **484.21 KB**. Counts describe working tracked content,
+not compressed Git history, environments or external raw capture takes.

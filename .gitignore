@@ -59,3 +59,8 @@ data/manifests/*
 !src/can_lab/data/synthetic.dbc
 !tests/fixtures/raw_can/example.dbc
 !src/can_lab/data/education.dbc
+
+# Documentation capture intermediates remain external/ignored; optimized GIFs only.
+*.webm
+*.mkv
+*.mp4

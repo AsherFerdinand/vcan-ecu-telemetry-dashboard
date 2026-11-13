@@ -305,3 +305,12 @@ not export screenshots, plot images or ZIPs during normal use.
 Future work should first measure usability and accessibility with actual learners,
 then resolve the existing acquisition/reference evidence gate. Keep evaluated
 production diagnostics distinct from these learning thresholds.
+
+
+## Automated portfolio demonstrations (v0.4.8)
+
+The existing sequences above now have genuine automated browser recordings in the
+README. Application code remains v0.4.7 and is unchanged. See the
+[recording workflow and verified inventory](portfolio_recording.md) for optional
+tooling, exact capture/optimization assumptions, source-tree provenance and
+Windows reproduction guidance. No GIF is a hardware or physical-accuracy claim.

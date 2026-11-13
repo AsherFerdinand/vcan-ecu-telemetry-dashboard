@@ -1,271 +1,164 @@
 # VCAN
-### Automotive Communication, Telemetry & Intelligent Diagnostics
 
-From CAN frames to engineering insights — a modular platform for vehicle communication, measurement analysis, and automated diagnostics.
+### Automotive CAN Engineering Studio
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB)
-![python-can](https://img.shields.io/badge/CAN-python--can-555555)
-![cantools](https://img.shields.io/badge/DBC-cantools-555555)
-![pandas](https://img.shields.io/badge/Data-pandas-150458)
-![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B)
-![pytest](https://img.shields.io/badge/Tests-pytest-0A9EDC)
+**Trace a CAN measurement from differential signalling to decoded telemetry—and inspect the evidence behind it.**
 
-## Project overview
+![Python 3.12 · Streamlit · python-can · cantools](docs/media/stack.svg)
 
-VCAN is a Python engineering laboratory for inspecting automotive communication
-and measurement data. It addresses the practical work of decoding known CAN
-messages, normalising signals, checking data quality, investigating operating
-conditions, and producing reproducible reports. Two distinct paths support that
-work: a virtual ECU with a verified synthetic DBC, and imported, already-decoded
-vehicle telemetry with explicit source provenance. Deterministic calculations
-cover vehicle dynamics, signed battery power and energy, cell measurements, and
-possible recording sessions. A local dashboard and command-line tools expose the
-same analysis without requiring an AI service or cloud account. The project
-emphasises traceable evidence and uncertainty: it distinguishes measurement
-anomalies from battery defects and inferred metadata from verified definitions.
-A configurable raw-CAN Recording adapter is implemented and synthetic-fixture validated.
-Independent real-vehicle CAN/DBC validation remains **blocked**; intelligent
-investigation and connected telemetry remain planned extensions.
+![Actual VCAN dark-mode overview](docs/images/experience-overview.jpg)
 
-## Current capabilities
+VCAN is a local automotive communication and telemetry laboratory. Configure an
+experiment, run it, inspect the actual frames and signals, and investigate how
+the result was produced. The same Python core supports virtual CAN, recorded
+frames, decoded EV workbooks, quality screening, engineering analysis and reports.
+No cloud account, AI API or private dataset is required to explore the studio.
 
-| Implemented foundation (v0.3) | Verified scope |
+## Watch the engineering
+
+These GIFs record the **actual running application** with automated Chromium
+interactions. They contain no mock screens, injected results or fabricated traffic.
+[Recording method, asset verification and reproduction](docs/portfolio_recording.md).
+
+### 1 · From payload bits to vehicle speed
+
+Inspect the standard frame and KUKSA-derived teaching definition. Raw **538** gives
+**3.04 km/h**; changing payload byte **AD → BD** gives raw **539** and **3.12 km/h**.
+Reset restores the known vector. This demonstrates DBC interpretation, not a
+calibrated measurement of an actual vehicle's speed.
+
+![Actual CAN Frame Laboratory: payload edit, recalculation and reset](docs/media/frame-laboratory.gif)
+
+### 2 · Follow one message across the shared bus
+
+Play retained deterministic events through an illustrative EV architecture.
+Orange transmission, cyan wire-following pulses and green receiver indications
+refer to the **same frame**. Wheel and crash sensors use local links; added safety
+electronics remain passive. Motion is schematic, not physical propagation or bitrate.
+
+![Actual virtual CAN network: event playback, wire-following pulses, pause and sensor inspection](docs/media/vehicle-network.gif)
+
+### 3 · Investigate bitwise arbitration
+
+Standard data-frame contenders **0x120**, **0x124** and **0x3E0** compare identifier
+bits using dominant-0/recessive-1 wired-AND. The cluster withdraws at bit 9, BMS at
+bit 2, and **0x120 wins**. Losing arbitration is normal, not a communication error.
+
+![Actual CAN arbitration: cluster loss, BMS loss, winner and reset](docs/media/can-arbitration.gif)
+
+## Engineering capabilities
+
+| Area | Implemented scope |
 | --- | --- |
-| Virtual ECU and CAN reception | Original synthetic RPM/speed/temperature, in-process virtual buses; Linux SocketCAN entry points retained |
-| DBC encoding/decoding and log import | Fixed synthetic protocol, classical `candump -L`; independent byte-vector tests |
-| Decoded telemetry import | Canonical CSV/JSON and profiled Excel; original cells, time, units and provenance retained for workbooks |
-| Quality and engineering analysis | Independent physical/metadata/time/missingness screening; candidate states, signed power/energy, cell spreads and possible sessions |
-| Delivery | Streamlit, recorded-data replay, JSON/CSV interchange and JSON/Markdown/feature-CSV engineering reports |
+| CAN Frame Laboratory | Standard 11-bit classical data frames, calculated CRC-15/CAN, bit stuffing, byte/bit inspection and cantools signal decoding |
+| Virtual communication | Original synthetic RPM/speed/temperature generator, python-can virtual transport and retained SocketCAN entry points |
+| Vehicle network | Four deterministic publishers, bounded release schedules, event-driven SVG playback, keyboard inspection and reduced motion |
+| Controlled diagnostics | Known synthetic silence, jitter and signal-step injections; thresholds and findings retain original event references |
+| Recorded data | Configurable supported candump/DBC investigation, frame provenance, sparse Recording adapter, canonical CSV/JSON and profiled Excel |
+| EV engineering | Separate physical/metadata/time/missingness screening; candidate operating states, qualified signed energy, cell indicators, replay and requested reports |
+| Learning | 20 practical FAQ topics and a local, explained beginner/intermediate knowledge check |
 
-The **v0.4 foundation (0.4.0.dev0)** adds configurable classical candump/DBC decoding,
-frame-to-signal provenance, an explicit sparse Recording adapter, bounded CLI/UI
-investigation, manual synthetic reference checks and requested JSON/Markdown reports
-with reproducibility manifests. It reuses existing engineering tools without
-cross-frame alignment. **Synthetic regressions passed; source-reported public vehicle decoding is
-demonstrated through Level 2. Independent physical validation remains BLOCKED.** The [KUKSA vehicle investigation](docs/kuksa_investigation.md) compares KUKSA and
-X-CANIDS, documents the acquisition-date discrepancy, and reproduces 10,000 decoded
-frames and three manual byte checks. The [raw CAN guide](docs/raw_can_validation.md)
-retains the original candidate assessments and evidence boundaries.
-Rules and thresholds remain screening heuristics, not a validated anomaly detector.
+Native **Light/Dark** appearance is available through the ⋮ menu. Use
+**Appearance → Apply appearance** to synchronize custom visuals. Existing imports,
+telemetry diagnostics and reports remain under **Vehicle Data → Existing data workflows**.
+[Workbench guide](docs/workbench.md).
 
-## Automotive Visual Experience (v0.4.7)
-
-The studio now offers native light/dark appearance, illustrated module cards and
-an original top-down EV diagram. Wire-following pulses traverse the actual drawn
-branches and shared bus from retained deterministic events. Four wheel sensors
-and crash sensors use local links; ABS/ESC and airbag electronics are passive
-illustrations, **not new publishers**. The original four-publisher model remains.
-
-Start/Pause/Step/Previous/Reset, keyboard inspection and reduced motion remain
-available. Fault views mark original evidence and label expected-but-unobserved
-releases without fabricating packets. CRC, stuffing, arbitration, DBC decoding and
-all existing vehicle-data tools are preserved.
-
-[Guide, genuine screenshots and three recording sequences](docs/workbench.md#automotive-visual-experience)
-explain the native theme picker and **Apply appearance** synchronization. Motion
-is schematic broadcast visualization, not physical propagation/bitrate simulation.
-
-## Engineering architecture
-
-Solid paths are implemented; dashed paths are planned or optional. The six-layer
-responsibility map and module dependency review are in [Architecture](docs/architecture.md).
+## Architecture
 
 ```mermaid
 flowchart LR
-  V[Virtual ECU / synthetic candump] --> D[Synthetic DBC decoder]
-  D --> T[TelemetrySample v1]
-  F[Canonical CSV / JSON] --> T
-  T --> O[Telemetry UI / JSON / CSV]
-  X[Decoded Excel + explicit profile] --> R[Recording + quality]
-  R --> E[Deterministic engineering analysis]
-  E --> P[Dashboard / replay / reports]
-  RAW[Classical candump + explicit matching DBC] --> AD[Bounded v0.4 decoder + provenance]
-  AD --> R
-  A[Planned diagnostic agent] -. tool orchestration .-> E
-  G[Optional future gateway / remote platform] -. future ingestion adapter .-> R
-  classDef planned fill:#f5f5f5,stroke:#777,stroke-dasharray:5 5;
-  class A,G planned;
+  S[Synthetic ECU / virtual CAN] --> D[DBC decoder]
+  C[Supported raw CAN + explicit DBC] --> D
+  D --> R[Sparse telemetry / Recording + provenance]
+  F[Canonical CSV/JSON / profiled EV workbook] --> R
+  R --> Q[Independent quality dimensions]
+  Q --> E[Deterministic engineering analysis]
+  E --> O[Streamlit / replay / requested reports]
+  T[Teaching frame / arbitration / ideal physical-layer models] --> O
 ```
 
-The small shared `pipeline.prepare_workbook` service prepares decoded workbooks
-for both CLI and dashboard. Numerical modules remain independent of Streamlit.
-No agent, forecasting model, gateway or cloud component is required or implemented.
+Numerical modules remain independent of Streamlit. Missing signals stay optional;
+separate CAN frames are not silently aligned or forward-filled. The network's
+release schedule and the bitwise identifier-arbitration experiment have distinct
+assumptions. [Architecture and schema contracts](docs/architecture.md).
 
-## Core workflows
+## Validation and real-data evidence
 
-The company names below describe engineering inspirations, **not affiliation,
-collaboration, endorsement, or official employer projects**. Status and acceptance
-boundaries are detailed in [Workflows](docs/WORKFLOWS.md).
+**375 automated tests pass**, including decoding vectors, frame/CRC/stuffing,
+arbitration, ideal common-mode cancellation, event provenance, fault evidence,
+imports, replay, engineering calculations, exports and frontend regressions.
+Ordinary CI uses small synthetic fixtures; the external KUKSA test is optional.
+Chromium checks cover genuine UI interaction, themes, motion paths, playback and
+keyboard inspection. [Executed validation record](docs/validation.md).
 
-**A — CAN log analysis (Marquardt-inspired): implemented foundation, synthetic validation**
+| Evidence | What has been established |
+| --- | --- |
+| Synthetic fixtures | Independently specified bytes/values and deterministic software regressions |
+| KUKSA source-reported vehicle CAN | **Level 2 DBC interpretation**: 10,000 frames decoded and three manual byte checks passed. Capture date/software attribution and capture-specific rights remain qualified |
+| SCUT decoded EV workbook | Historical analysis of 81,898 already-decoded observations; yearless timestamp interpretation remains inferred and some units/polarity/sentinel meanings unresolved |
+| Independent physical accuracy | **Pending**; neither plausible signals, a DBC nor agreement between decoders proves sensor calibration or vehicle truth |
 
-```mermaid
-flowchart LR
-  A[Classical candump + DBC] --> B[Bounded decode + frame trace] --> C[Sparse Recording + quality]
-  C --> D[Existing engineering / reports]
-  D -. real capture and independent evidence gate .-> V[Blocked real-vehicle validation]
-```
+Sources and exact revisions/hashes: [KUKSA investigation](docs/kuksa_investigation.md),
+[raw-CAN validation](docs/raw_can_validation.md), [SCUT dataset guide](docs/real_world_telemetry.md).
+Recordings/workbooks are not bundled. No ID.3 or Taycan adapter is advertised;
+[earlier dataset research](docs/datasets.md) records the unresolved evidence.
 
-**B — Intelligent diagnostic investigation (Bosch Rexroth-inspired): planned orchestration**
+## Run locally
 
-```mermaid
-flowchart LR
-  Q[Engineer question] -.-> A[Planned agent] -.-> T[Existing deterministic tools]
-  T -.-> E[Evidence / historical comparison / replay] -.-> H[Human-reviewed root-cause candidates]
-```
-
-**C — Connected vehicle telemetry (Porsche-inspired): optional research track**
-
-```mermaid
-flowchart LR
-  S[Sensors / ECUs] -.-> N[Vehicle network] -.-> G[Future acquisition gateway]
-  G -. timestamp + buffer + secure internet transport .-> C[Future remote storage]
-  C -.-> D[Engineering delivery]
-```
-
-CAN is a vehicle communication network, not an internet transport. A vehicle ECU
-network does not automatically provide a gateway or cloud connection.
-
-## Real-world dataset investigation
-
-The public [SCUT EV operation dataset](https://github.com/Translab-SCUT/Electric-vehicle-operation-data)
-was reviewed at revision `f3bc3eb9132c46fc75e3e60662515dbaf7325c98`.
-Its `vehicle#1.xlsx` contains **81,898 already-decoded observations**, not raw CAN
-frames. Prior full-file checks found 700 possible sessions and 79,973 accepted /
-1,924 excluded energy intervals. `MDDHHMMSS` fits the calendar/cadence evidence,
-but remains **inferred**; the year/timezone, current polarity, SOC scale and some
-sentinel meanings remain unresolved. No real-recording/matching-DBC validation
-can be inferred from that workbook analysis.
-
-Use **Real-World EV Dataset → Use source-reviewed SCUT profile** in the dashboard.
-Metadata warnings are distinct from physical suspicion; no raw rows are deleted.
-Signed energy is over accepted intervals only, not verified efficiency. The
-workbook is not bundled; source/licensing details, signal mapping and reproduction
-are in the [dataset guide](docs/real_world_telemetry.md) and [validation record](docs/validation.md).
-
-## Development roadmap
-
-| Version | Status | Milestone |
-| --- | --- | --- |
-| v0.3 | Implemented foundation | Synthetic CAN, decoded EV telemetry, deterministic diagnostics, UI/reports |
-| v0.4 | Synthetic-validated foundation; real-data gate blocked | 10,000 source-reported vehicle frames decoded (Level 2); provenance caveats and independent physical validation outstanding |
-| v0.4.5 | Interactive workbench implemented | Synthetic learning experiments; source-qualified data workflows retained |
-| v0.4.6 | Visual studio implemented | Calculated frame/CRC, arbitration, ideal differential illustration and event playback |
-| v0.4.7 | Automotive visual experience implemented | Native light/dark themes, event-linked wire pulses and passive/local sensor illustration |
-| v0.5 | Planned | Evaluated event/anomaly detection, including message timing |
-| v0.6 | Planned | Forecasting baselines and chronological held-out evaluation |
-| v0.7 | Planned | Read-only, evidence-based AI tool orchestration with human review |
-| v0.8 | Optional research | Buffered gateway, secure transport and remote telemetry prototype |
-
-[Roadmap acceptance criteria](docs/ROADMAP.md) define what would justify each claim.
-v0.4 is a foundation/pre-release, not a completed real-data milestone; v0.5–v0.8 remain planned.
-
-## Validation and testing
-
-**375 automated tests passed** in this revision, retaining all 366 preceding tests; one external-data test is
-skipped by default and passed separately against the pinned KUKSA inputs. Coverage includes independent synthetic CAN vectors, virtual transport,
-imports, uncertainty, engineering calculations, replay, exports and dashboard
-integration. The latest executed environment/platform checks are recorded in
-[docs/validation.md](docs/validation.md); historical SCUT results are kept separate
-from any current rerun. Installation needs package access; local analysis itself
-requires no AI service, internet connection, cloud platform or private dataset.
-
-## Quick start
-
-Requires Git and **Python 3.12**. This revision is on
-`feat/automotive-visual-experience`; the validated v0.3 branch is preserved.
-The version lock includes Streamlit and Excel/test dependencies. It was produced
-for Python 3.12 on Linux; it is not an artifact-hash or native-Windows validation claim.
-
-**Windows PowerShell:** use a short writable path, for example
-`C:\Projects\CAN-Lab-v0.4.5`. These Windows commands are provided and reviewed, but
-native Windows execution was not available in the Linux verification environment.
-No virtual-environment activation or execution-policy change is required.
-
-```powershell
-New-Item -ItemType Directory -Force C:\Projects | Out-Null
-git clone --branch feat/automotive-visual-experience https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git C:\Projects\CAN-Lab-v0.4.5
-Set-Location C:\Projects\CAN-Lab-v0.4.5
-py -3.12 -m venv .venv
-& .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
-& .\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e .
-& .\.venv\Scripts\python.exe -m pip check
-& .\.venv\Scripts\python.exe -m pytest -ra
-& .\.venv\Scripts\python.exe -m can_lab.cli demo --steps 10
-& .\.venv\Scripts\python.exe -m streamlit run src/can_lab/dashboard.py --server.headless true --browser.gatherUsageStats false
-```
-
-Stop Streamlit with Ctrl+C. Optionally generate a clearly synthetic workbook and
-engineering reports using fresh output filenames:
-
-```powershell
-New-Item -ItemType Directory -Force outputs | Out-Null
-& .\.venv\Scripts\python.exe examples/make_ev_fixture.py outputs/synthetic.xlsx
-& .\.venv\Scripts\python.exe -m can_lab.cli report-xlsx outputs/synthetic.xlsx --profile outputs/synthetic.profile.json --output-prefix outputs/report --include-features
-```
-
-**Linux/macOS shell:** the commands below are verified on Linux; macOS is not
-claimed as tested. Run from a checkout of this branch:
+Requires **Python 3.12** and Git. Run from the repository root:
 
 ```bash
+git clone --branch feat/portfolio-readme-demonstrations https://github.com/AsherFerdinand/vcan-ecu-telemetry-dashboard.git
+cd vcan-ecu-telemetry-dashboard
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lock.txt
 .venv/bin/python -m pip install --no-build-isolation --no-deps -e .
-.venv/bin/python -m pip check
 .venv/bin/python -m pytest -ra
 .venv/bin/python -m can_lab.cli demo --steps 10
-.venv/bin/python -m streamlit run src/can_lab/dashboard.py --server.headless true --browser.gatherUsageStats false
+.venv/bin/python -m streamlit run src/can_lab/dashboard.py --server.headless true
 ```
 
-The demo uses two virtual bus instances in one process; it is not physical CAN.
-The [engineering guide](docs/engineering_v0.3.md#reproduce) covers reports and
-Linux SocketCAN details remain in [Workflows](docs/WORKFLOWS.md#local-can-reproduction).
+These shell commands were verified on Linux. On **Windows PowerShell**, use
+`py -3.12 -m venv .venv` and replace each `.venv/bin/python` with
+`& .\.venv\Scripts\python.exe`; no environment activation is required. Use a short
+writable checkout path. Native Windows/macOS execution is not claimed; the lock
+was produced on Python 3.12/Linux.
 
-## Raw CAN and storage reproduction
+The demo uses two virtual bus instances in one process, not physical CAN.
+[SocketCAN instructions](docs/WORKFLOWS.md#local-can-reproduction) and
+[workbook/report reproduction](docs/engineering_v0.3.md#reproduce) remain available.
 
-The [executed KUKSA investigation](docs/kuksa_investigation.md#reproduce-without-a-large-archive)
-uses a 9.21 MB public example plus a 322.43 KB bundled DBC outside Git, not the large
-compressed capture. Three manual DBC interpretation checks pass; no calibrated
-physical reference is claimed. The capture/date/licensing limitations are explicit.
+## Scope and limitations
 
+The studio is an engineering workbench, not production vehicle firmware or a
+validated fault-diagnosis system. The configurable investigation supports only
+its documented standard-ID classical integer-signal scope—not general CAN FD,
+extended/multiplexed OEM decoding or Automotive Ethernet. Educational motion does
+not model bus occupancy, error/retry timing, EMC or crash/braking physics.
 
-After installation, follow the [complete tiny-fixture investigation](docs/raw_can_validation.md#dataset-free-reproducible-example)
-or select **Raw CAN Investigation (v0.4 foundation)** in the dashboard. No research
-capture download is required. Reports and intermediate Recording exports are opt-in.
-Keep original captures outside Git using `VCAN_DATA_DIR`; reviewed small manifests
-belong in [data/](data/README.md). Inspect storage without deleting anything:
+Hardware CAN validation and independent physical references remain outstanding.
+There is **no implemented AI diagnostic agent, forecasting model, cloud gateway or
+automated root-cause system**. Screening findings are not confirmed battery defects,
+SOH estimates or measured efficiency. Company references in the workflow guide
+are inspirations, not affiliations or endorsements.
+
+## Documentation and next milestones
+
+| Guide | Purpose |
+| --- | --- |
+| [Workbench](docs/workbench.md) | Controls, teaching assumptions, FAQ/quiz and genuine screenshots |
+| [Recording workflow](docs/portfolio_recording.md) | Automated browser capture, GIF verification and asset provenance |
+| [Architecture / schema](docs/architecture.md) | Modules, interfaces and canonical vs provenance-rich models |
+| [Workflows](docs/WORKFLOWS.md) | CAN and decoded-telemetry procedures; implemented/planned boundaries |
+| [Engineering calculations](docs/engineering_v0.3.md) | Thresholds, numerical policies and reporting |
+| [Validation](docs/validation.md) | Executed tests, historical findings and unresolved limitations |
+| [Roadmap](docs/ROADMAP.md) | Evidence gates for evaluated detection, forecasting, AI orchestration and optional connected delivery |
+| [Data / artifacts](docs/data_artifacts.md) | Retention, reproducibility, backups and read-only storage audit |
+
+Next: resolve acquisition/reference evidence, validate native Windows/accessibility,
+and evaluate production detector performance before advancing beyond teaching rules.
+Keep datasets external and outputs opt-in. Audit storage without deleting evidence:
 
 ```bash
 python -m can_lab.cli storage-audit --repository-root . --output-root outputs
 ```
-
-The [artifact guide](docs/data_artifacts.md) defines source/generated/evidence
-retention, safe output paths, backup responsibilities and resource bounds.
-
-## Engineering documentation
-
-| Document | Purpose |
-| --- | --- |
-| [Workbench guide](docs/workbench.md) | Interactive experiments, FAQ/quiz and actual application screenshots |
-| [Architecture](docs/architecture.md) | Six layers, actual dependencies, review findings and schema v1 |
-| [Workflows](docs/WORKFLOWS.md) | Three engineering problems, implemented/planned boundaries and commands |
-| [Roadmap](docs/ROADMAP.md) | v0.3–v0.8 scope and acceptance criteria |
-| [Data schema](docs/architecture.md#schema-v1) / [recording mapping](docs/real_world_telemetry.md#source-mapping) | Canonical vs provenance-rich recording models |
-| [Dataset guide](docs/real_world_telemetry.md) | SCUT attribution, source units and timestamp uncertainty |
-| [Engineering guide](docs/engineering_v0.3.md) | Calculations, thresholds, module file map and dashboard descriptions |
-| [Validation record](docs/validation.md) | Executed evidence, historical checks and unresolved limitations |
-| [Earlier dataset research](docs/datasets.md) | Unverified ID.3/Taycan investigation; no vehicle adapter claims |
-
-## Visual evidence and limitations
-
-Historical workbench and current studio [actual screenshots](docs/workbench.md#actual-application-screenshots)
-are retained as documentation evidence. They show the running Linux browser UI,
-not physical vehicle validation or fabricated mockups.
-
-Physical CAN hardware and independent real-vehicle recording/DBC validation remain
-outstanding. The original codec retains its synthetic protocol; the configurable investigation
-path supports standard-ID classical integer DBC signals only:
-no CAN FD, Automotive Ethernet, general OEM decoder, forecasting model, AI agent,
-automated root-cause system, connected gateway or cloud backend is claimed.
-Screening findings are not confirmed faults or SOH estimates. A future agent would
-coordinate validated tools, not replace numerical methods or human judgment.
