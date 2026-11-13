@@ -67,6 +67,7 @@ def main(argv=None):
     raw = commands.add_parser('investigate-can', help='bounded classical candump + explicit DBC investigation')
     raw.add_argument('input', type=Path)
     raw.add_argument('--dbc', type=Path, required=True)
+    raw.add_argument('--dbc-frame-id', type=lambda value: int(value,0), action='append', help='explicit standard-ID DBC scope; repeat; decimal or 0x hex')
     raw.add_argument('--mapping', type=Path)
     raw.add_argument('--references', type=Path)
     raw.add_argument('--provenance', type=Path)

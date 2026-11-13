@@ -1,0 +1,7 @@
+[
+  {
+    "frame_id": 599,
+    "signal": "DI_vehicleSpeed",
+    "target": "speed_kmh"
+  }
+]

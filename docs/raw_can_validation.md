@@ -1,15 +1,16 @@
 # Raw CAN investigation — v0.4 foundation
 
-**Implemented; validated with synthetic fixtures. Real-vehicle validation BLOCKED.**
-This is a reusable offline decoder/Recording adapter, not a completed real-CAN
-validation milestone. No independently verified physical vehicle accuracy is
+**Implemented; synthetic regressions plus source-reported public vehicle decoding (Level 2). Independent physical validation BLOCKED.**
+The [KUKSA investigation](kuksa_investigation.md) exercises the existing pipeline
+on a source-reported vehicle excerpt with explicit provenance caveats. This is not
+a completed independent real-CAN validation milestone. No independently verified physical vehicle accuracy is
 claimed. The previously studied SCUT workbook is already decoded and cannot close
 this raw-frame evidence gap.
 
-## Candidate assessment
+## Initial foundation candidate assessment
 
-Reviewed public repositories at the revisions below. Tool/DBC licensing does not
-automatically license external captures. No complete qualifying candidate was
+The earlier foundation review assessed public repositories at the revisions below. Tool/DBC licensing does not
+automatically license external captures. No complete qualifying Level 4 candidate was
 selected; therefore no research capture or third-party DBC is redistributed.
 
 | Candidate / pinned revision | Available evidence | Decision and unresolved checks |
@@ -41,7 +42,8 @@ separate counters and bounded examples. Mixed selected channels require an expli
 filter. Coverage clearly states when a scan limit prevents a full-source claim.
 
 Mappings explicitly identify frame ID, DBC signal and canonical target; declared
-units must match canonical units exactly. No heuristic conversion, brand matching,
+units must match canonical units, with the explicit conventional `kph` → `km/h`
+spelling alias (factor 1), retaining both source and canonical unit metadata. No heuristic conversion, brand matching,
 current-polarity assumption or signal fabrication occurs. The adapter produces one
 `Recording` observation per decoded frame. Signals absent from that frame remain
 missing. **No alignment, interpolation, filling or cross-frame power calculation**
@@ -115,3 +117,15 @@ Evidence levels remain distinct: parser correctness, DBC interpretation checks,
 numeric plausibility, and independently verified physical accuracy. A DBC unit is
 DBC-declared metadata, not independent sensor calibration evidence. See
 [artifact policy](data_artifacts.md) for storage, bounded execution and manifests.
+
+
+## Vehicle evidence sprint
+
+KUKSA and X-CANIDS comparison, exact source revisions/licenses, worked raw-byte
+examples, bounded execution statistics and reproducible commands are in the
+[KUKSA engineering investigation](kuksa_investigation.md). This establishes parser
+and selected DBC interpretation on source-reported vehicle data, not independent
+physical accuracy. Explicit DBC ID selection allows the three supported
+nonmultiplexed messages from the larger DBC without enabling multiplexing. The
+original full-DBC hash remains in the manifest. Unselected IDs count as unknown
+within that scope. Default behaviour still rejects unsupported DBC definitions.

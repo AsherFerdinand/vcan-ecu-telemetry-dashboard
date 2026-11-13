@@ -32,7 +32,7 @@ class SyntheticCodec:
                                source=source, **values)
 
 
-def load_classical_dbc(text):
+def load_classical_dbc(text, *, frame_ids=None):
     """Load a strict, standard-ID classical integer-signal DBC for offline review.
 
     Existing SyntheticCodec is unchanged. This deliberately rejects untested
@@ -46,6 +46,15 @@ def load_classical_dbc(text):
         raise ValueError('DBC contains no messages')
     if len({message.frame_id for message in database.messages})!=len(database.messages):
         raise ValueError('duplicate DBC message identifiers are ambiguous')
+    if frame_ids is not None:
+        if not isinstance(frame_ids,(list,tuple)) or not frame_ids or any(type(value) is not int or not 0 <= value <= 0x7ff for value in frame_ids) or len(set(frame_ids)) != len(frame_ids):
+            raise ValueError('DBC selection requires unique standard frame IDs')
+        absent = set(frame_ids) - {message.frame_id for message in database.messages}
+        if absent:
+            raise ValueError('selected frame ID absent from DBC')
+        # Keep original definitions intact; only the explicitly selected messages
+        # enter the supported decoder. The original DBC hash is retained upstream.
+        database = cantools.database.Database(messages=[message for message in database.messages if message.frame_id in frame_ids], strict=True)
     for message in database.messages:
         if len({s.name for s in message.signals})!=len(message.signals):
             raise ValueError('duplicate DBC signal names are ambiguous')

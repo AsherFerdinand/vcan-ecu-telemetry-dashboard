@@ -13,7 +13,7 @@ from .engineering import analyze_engineering
 
 def render_raw_can():
     st.subheader('Raw CAN investigation — v0.4 foundation')
-    st.warning('Implemented and validated with synthetic fixtures only. A compatible real recording/DBC with independent physical references has not been selected. Successful decoding does not establish vehicle accuracy.')
+    st.warning('Ordinary CI is validated with synthetic fixtures only. The KUKSA source-reported real-vehicle investigation is documented separately; capture provenance has unresolved discrepancies and independent physical accuracy remains unverified. Successful decoding does not establish vehicle accuracy.')
     example=st.checkbox('Use repository synthetic CAN example',value=False,key='can_example')
     log=st.file_uploader('Classical candump recording',type=['log','txt'],key='can_log')
     dbc=st.file_uploader('Matching DBC (standard-ID classical integer signals only)',type=['dbc'],key='can_dbc')
@@ -22,12 +22,14 @@ def render_raw_can():
     with st.expander('Bounded investigation settings'):
         maximum=st.number_input('Maximum scanned non-comment records',min_value=1,max_value=20000,value=10000,step=100)
         basis=st.selectbox('Declared raw timestamp basis',['relative','unix'],key='can_time_basis')
+        scope=st.text_input('Optional DBC frame IDs (comma-separated, e.g. 0x118,0x257,0x266)',value='')
         channel=st.text_input('Select channel (blank requires a single selected channel)',value='')
         start=st.text_input('Start seconds (blank = no lower bound)',value='')
         end=st.text_input('End seconds (blank = no upper bound)',value='')
     if st.button('Investigate raw CAN',key='can_investigate'):
         try:
             options=CANConfig(max_frames=int(maximum),max_preview_frames=min(100,int(maximum)),time_basis=basis,
+                              dbc_frame_ids=tuple(int(value.strip(),0) for value in scope.split(',')) if scope.strip() else None,
                               channel=channel or None,start_s=float(start) if start.strip() else None,end_s=float(end) if end.strip() else None)
             source_meta=None;dbc_meta=None
             if example:

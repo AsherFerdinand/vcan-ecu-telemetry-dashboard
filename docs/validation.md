@@ -518,3 +518,81 @@ At implementation commit `f5e852b141cf02772360619d63d417eec16a87e5`:
 No historical archive was needed. The verification clone is a small shallow source
 checkout, not a copied research dataset or another full dependency environment.
 Native Windows/macOS and physical CAN hardware remain untested in this execution.
+
+## Real vehicle evidence sprint — 2026-11-13
+
+Starting revision: `eca7498069d664b1b372765ed45e55cf62c9a84e`, same
+`dev/v0.4-real-can-validation` branch. Historical foundation checks above remain
+historical; the new [KUKSA investigation](kuksa_investigation.md) documents the
+subsequent source comparison, exact revisions/licenses, manual arithmetic,
+commands and limitations. **Level 2 DBC interpretation demonstrated on a public
+source-reported vehicle excerpt; Level 4 independent physical accuracy blocked.**
+
+KUKSA commit `23f81d0b847e4ac353c7cc2eeaa89a4cc0fe4053` supplies the selected
+9,207,888-byte `candump.log` and 322,430-byte bundled `Model3CAN.dbc`. Both full
+hashes are in `data/manifests/kuksa_model3.json` and checked before parsing.
+The README associates these files with a 2018 Tesla M3, but the small log's
+Unix-interpreted August 2020 clock contradicts attribution to a December 2021
+trace/software 2021.40.6. Exact small-log origin, capture rights, upstream DBC
+ancestry and physical calibration remain unresolved. Repository Apache-2.0 and
+upstream model3dbc MIT licenses are recorded separately; no raw capture/DBC is
+redistributed. X-CANIDS at `eed0d1efb42b3fd29bd39a4e1050b90b84d625da` documents
+Sonata raw/signal data but provides no usable raw download in the reviewed tree,
+no pinned DBC revision or capture license. Its described signals are same-DBC,
+5 ms most-recent-value samples, not independent physical references.
+
+Only narrow implementation extensions were needed: explicit DBC message-ID scope
+preserving the original DBC hash, the conventional `kph` → `km/h` identity alias
+with source units retained, and compact per-signal count/range summaries. The
+three selected messages are not multiplexed; unsupported protocols still fail.
+The existing sparse Recording adapter, quality and engineering modules were reused.
+No v0.5 detector, dependency, resampler or new framework was added.
+
+### Executed results
+
+- First 10,000 original frames / 40.093851 s: all 10,000 decoded; 4,006 ID 0x118,
+  1,994 ID 0x257, 4,000 ID 0x266; no malformed, unknown, wrong-length or decode errors
+  in the subset. `limit_reached=true`; no whole-recording decode-coverage claim.
+- Source has 191,831 lines and first-to-last numeric span 769.139591 s, measured
+  separately without retaining a full decoded recording. Full source hash is used
+  even for the bounded subset. No extracted source copy is written.
+- Three manual vectors pass at 1e−10 absolute tolerance: pedal 12.8 %, rear motor
+  power 4.5 kW, speed 3.04 kph. They validate DBC bit/scaling interpretation, not
+  physical calibration. Ranges: speed −6.56–3.04 kph, pedal 0–12.8 %, power 0–4.5 kW.
+- 249 negative-speed observations are retained and flagged by existing nonnegative
+  speed screening; 1,745 mapped observations are numerically plausible. 8,006 frames
+  have no mapped speed. Missing signals and unverified metadata are preserved.
+- No numeric timestamp invalidity or reversal. Existing cross-message cadence
+  screening flags 5,634 irregular intervals; that policy is not a CAN clock-fault
+  detector. Date/clock authenticity is still unverified.
+- All 9,999 energy intervals excluded because electrical measurements are absent.
+  Rear-inverter power is not mapped to battery power. Sparse-frame analysis gives
+  1,723 stationary candidates, 22 unknown, 8,255 insufficient evidence; no derivative,
+  route, confirmed operating-state or total-energy claim is made.
+- Default suite: **276 passed, 1 skipped** in 15.48 s, retaining all 263 prior tests.
+  Optional `VCAN_KUKSA_DIR` integration: **1 passed** in 2.15 s. It verifies exact
+  hashes, real-source values, original byte-offset payload lookup, the 10,000-frame
+  cap, manifest reference configuration and refusal to overwrite reports.
+- Tests for selected/unselected/unsupported DBC messages, invalid ID scopes, unit
+  alias provenance, deterministic signal summaries and reproduction arguments use
+  only authored synthetic fixtures. External data are never downloaded by CI.
+- Virtual CAN demo: 20 samples, zero flagged. Existing tests still exercise original
+  simulation, DBC, replay and exports. No physical CAN host or calibrated instruments
+  were used.
+
+### Storage audit
+
+Starting tracked source: 79 files / 423,551 content bytes. Starting ignored outputs:
+21 files / 400,616 bytes. The development investigation explicitly wrote four compact
+reports/manifests totalling **41,830 bytes**, giving 25 outputs / 442,446 bytes.
+Largest outputs remain historical synthetic JSON 82,205 bytes, demo JSON 78,948,
+synthetic CSV 72,121 and feature CSV 54,569. The new CAN JSON is 19,660 bytes and
+engineering/quality summary 9,235 bytes; no full 10,000-row export or plots were saved.
+Raw inputs total **9,530,318 bytes**, once each outside Git. Research text/HTML probes
+also stay external. No large archive was downloaded/extracted, no dataset copies or
+new environment/package installs were required, and no files were deleted.
+
+Reviewed source/license documents, original capture and any signed-off results need
+separate owner-managed retention/backups; Git contains only code, small configurations,
+synthetic tests and documentation. Run manifests retain their exact hashes and dirty
+state. This sprint follows the existing [retention policy](data_artifacts.md).

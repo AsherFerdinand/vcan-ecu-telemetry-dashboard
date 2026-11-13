@@ -41,9 +41,11 @@ The **v0.4 foundation (0.4.0.dev0)** adds configurable classical candump/DBC dec
 frame-to-signal provenance, an explicit sparse Recording adapter, bounded CLI/UI
 investigation, manual synthetic reference checks and requested JSON/Markdown reports
 with reproducibility manifests. It reuses existing engineering tools without
-cross-frame alignment. **Validated with synthetic fixtures; public real-CAN and
-independent physical validation are BLOCKED.** Three reviewed candidate sources
-and the next acquisition requirements are in the [raw CAN guide](docs/raw_can_validation.md).
+cross-frame alignment. **Synthetic regressions passed; source-reported public vehicle decoding is
+demonstrated through Level 2. Independent physical validation remains BLOCKED.** The [KUKSA vehicle investigation](docs/kuksa_investigation.md) compares KUKSA and
+X-CANIDS, documents the acquisition-date discrepancy, and reproduces 10,000 decoded
+frames and three manual byte checks. The [raw CAN guide](docs/raw_can_validation.md)
+retains the original candidate assessments and evidence boundaries.
 Rules and thresholds remain screening heuristics, not a validated anomaly detector.
 
 ## Engineering architecture
@@ -129,7 +131,7 @@ are in the [dataset guide](docs/real_world_telemetry.md) and [validation record]
 | Version | Status | Milestone |
 | --- | --- | --- |
 | v0.3 | Implemented foundation | Synthetic CAN, decoded EV telemetry, deterministic diagnostics, UI/reports |
-| v0.4 | Synthetic-validated foundation; real-data gate blocked | Raw decoder/Recording adapter, provenance, bounded investigation; independent matching-capture validation outstanding |
+| v0.4 | Synthetic-validated foundation; real-data gate blocked | 10,000 source-reported vehicle frames decoded (Level 2); provenance caveats and independent physical validation outstanding |
 | v0.5 | Planned | Evaluated event/anomaly detection, including message timing |
 | v0.6 | Planned | Forecasting baselines and chronological held-out evaluation |
 | v0.7 | Planned | Read-only, evidence-based AI tool orchestration with human review |
@@ -140,7 +142,8 @@ v0.4 is a foundation/pre-release, not a completed real-data milestone; v0.5–v0
 
 ## Validation and testing
 
-**263 automated tests passed** in this revision, retaining all 215 baseline tests. Coverage includes independent synthetic CAN vectors, virtual transport,
+**276 automated tests passed** in this revision, retaining all 263 preceding tests; one external-data test is
+skipped by default and passed separately against the pinned KUKSA inputs. Coverage includes independent synthetic CAN vectors, virtual transport,
 imports, uncertainty, engineering calculations, replay, exports and dashboard
 integration. The latest executed environment/platform checks are recorded in
 [docs/validation.md](docs/validation.md); historical SCUT results are kept separate
@@ -199,6 +202,12 @@ The [engineering guide](docs/engineering_v0.3.md#reproduce) covers reports and
 Linux SocketCAN details remain in [Workflows](docs/WORKFLOWS.md#local-can-reproduction).
 
 ## Raw CAN and storage reproduction
+
+The [executed KUKSA investigation](docs/kuksa_investigation.md#reproduce-without-a-large-archive)
+uses a 9.2 MB public example plus a 322 KB bundled DBC outside Git, not the large
+compressed capture. Three manual DBC interpretation checks pass; no calibrated
+physical reference is claimed. The capture/date/licensing limitations are explicit.
+
 
 After installation, follow the [complete tiny-fixture investigation](docs/raw_can_validation.md#dataset-free-reproducible-example)
 or select **Raw CAN Investigation (v0.4 foundation)** in the dashboard. No research

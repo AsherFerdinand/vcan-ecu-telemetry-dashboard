@@ -15,3 +15,8 @@ successful decode alone does not establish either.
 
 See [raw CAN investigation](../docs/raw_can_validation.md) for reproduction and
 [artifact retention](../docs/data_artifacts.md) for backups and storage policy.
+
+`manifests/kuksa_model3.json` pins the externally obtained KUKSA excerpt and full
+DBC hashes, source revision and qualified license/provenance status. The separate
+`kuksa_mapping.json` maps only speed; it contains no capture data. Reproduction
+and the blocked physical-validation gate are in the [investigation](../docs/kuksa_investigation.md).

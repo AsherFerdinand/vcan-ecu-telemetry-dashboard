@@ -53,3 +53,8 @@ data/manifests/*
 !tests/fixtures/synthetic.csv
 !tests/fixtures/mapped.csv
 !tests/fixtures/raw_can/example.log
+
+# Third-party/research DBCs stay external; reviewed authored definitions only.
+*.dbc
+!src/can_lab/data/synthetic.dbc
+!tests/fixtures/raw_can/example.dbc

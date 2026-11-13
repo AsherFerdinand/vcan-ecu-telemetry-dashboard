@@ -27,7 +27,7 @@ def run(args):
             raise ValueError('source manifest requires source, dbc and expected_hashes objects')
         if args.source_metadata or args.dbc_metadata:raise ValueError('use either provenance manifest or individual source metadata')
     config=CANConfig(max_frames=args.max_frames,max_preview_frames=min(args.preview_frames,args.max_frames),
-        max_source_bytes=args.max_source_bytes,channel=args.channel,start_s=args.start_s,end_s=args.end_s,time_basis=args.time_basis)
+        max_source_bytes=args.max_source_bytes,dbc_frame_ids=getattr(args,'dbc_frame_id',None),channel=args.channel,start_s=args.start_s,end_s=args.end_s,time_basis=args.time_basis)
     outputs=[]
     root=Path(args.output_root).absolute()
     if args.output_prefix:
@@ -63,6 +63,8 @@ def run(args):
         for key in ('mapping','references','source_metadata','dbc_metadata','provenance'):
             if getattr(args,key):command+=['--'+key.replace('_','-'),portable(getattr(args,key),'VCAN_CONFIG_DIR')]
         command+=['--max-source-bytes',str(config.max_source_bytes),'--preview-frames',str(config.max_preview_frames)]
+        for identifier in config.dbc_frame_ids or ():
+            command+=['--dbc-frame-id',hex(identifier)]
         if config.channel:command+=['--channel',config.channel]
         if config.start_s is not None:command+=['--start-s',str(config.start_s)]
         if config.end_s is not None:command+=['--end-s',str(config.end_s)]

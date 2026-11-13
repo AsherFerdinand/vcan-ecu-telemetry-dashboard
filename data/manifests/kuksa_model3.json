@@ -1,0 +1,24 @@
+{
+  "schema": "vcan-source-manifest-1",
+  "source": {
+    "dataset_id": "KUKSA small candump excerpt (source-reported Tesla Model 3)",
+    "url": "https://raw.githubusercontent.com/eclipse-kuksa/kuksa-can-provider/23f81d0b847e4ac353c7cc2eeaa89a4cc0fe4053/candump.log",
+    "revision": "23f81d0b847e4ac353c7cc2eeaa89a4cc0fe4053",
+    "kind": "source_reported_vehicle_capture",
+    "license": "Repository Apache-2.0; capture-specific acquisition grant not established; not redistributed here",
+    "compatibility_status": "README associates log with Model3CAN.dbc; small-log clock contradicts larger-trace date/software attribution"
+  },
+  "dbc": {
+    "dataset_id": "KUKSA bundled Model3CAN.dbc",
+    "url": "https://raw.githubusercontent.com/eclipse-kuksa/kuksa-can-provider/23f81d0b847e4ac353c7cc2eeaa89a4cc0fe4053/Model3CAN.dbc",
+    "revision": "23f81d0b847e4ac353c7cc2eeaa89a4cc0fe4053",
+    "kind": "community_reverse_engineered_dbc",
+    "license": "KUKSA repository Apache-2.0; referenced Josh Wardell model3dbc project MIT; no DBC redistribution here",
+    "compatibility_status": "Source-associated; explicit 0x118/0x257/0x266 scope; not OEM/calibration verified"
+  },
+  "expected_hashes": {
+    "source": "a47687a2efc115e4cbfa4c2738049eb7987dde68fff6251002966cd5f886b2b5",
+    "dbc": "d54df533fc82f3dab11ddd0f5ae4d846f22c0a24b111d8cba2b93e79caf60151"
+  },
+  "evidence_status": "Level 2 DBC interpretation; conditional numeric plausibility only; Level 4 blocked"
+}

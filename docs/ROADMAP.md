@@ -30,10 +30,11 @@ being advertised as natively tested.
 
 ## v0.4 — Real CAN recording validation
 
-**Foundation implemented and validated with synthetic fixtures. Real-data gate BLOCKED.**
+**Foundation implemented; synthetic regressions and source-reported public vehicle
+DBC interpretation (Level 2) demonstrated. Independent physical gate BLOCKED.**
 The configurable decoder, raw-frame provenance, sparse Recording adapter, bounded
-CLI/dashboard and opt-in reports/manifests now operate. Three source assessments
-did not establish a qualifying independently referenced real capture/DBC pair; see
+CLI/dashboard and opt-in reports/manifests now operate. The initial three source assessments and subsequent KUKSA/X-CANIDS sprint
+did not establish independent physical reference measurements; see
 [raw CAN validation](raw_can_validation.md). The following acceptance criteria
 remain the gate for claiming complete real-data validation.
 
@@ -58,7 +59,9 @@ Acceptance criteria:
 
 Physical bus testing is a separate evidence claim and requires a documented
 interface/host setup; a successful offline decode alone is not hardware validation.
-No real dataset is selected or acquired automatically. The implemented adapter
+The [KUKSA investigation](kuksa_investigation.md) selects the source-reported
+small vehicle excerpt and bundled DBC for Level 2, with unresolved date/software
+attribution and capture-specific rights. No dataset is acquired automatically. The implemented adapter
 is not evidence of independent vehicle accuracy.
 
 ## v0.5 — Automated event and anomaly detection

@@ -28,11 +28,16 @@ class CANConfig:
     start_s: float | None = None
     end_s: float | None = None
     time_basis: str = 'relative'  # declaration, never inferred from magnitude
+    dbc_frame_ids: tuple[int, ...] | None = None
 
     def __post_init__(self):
         for key in ('max_frames','max_preview_frames','max_line_bytes','max_source_bytes'):
             if type(getattr(self,key)) is not int or getattr(self,key)<1:
                 raise ValueError(f'{key} must be a positive integer')
+        if self.dbc_frame_ids is not None:
+            if not isinstance(self.dbc_frame_ids,(tuple,list)) or not self.dbc_frame_ids or any(type(value) is not int or not 0 <= value <= 0x7ff for value in self.dbc_frame_ids) or len(set(self.dbc_frame_ids))!=len(self.dbc_frame_ids):
+                raise ValueError('DBC selection requires unique standard frame IDs')
+            self.dbc_frame_ids=tuple(self.dbc_frame_ids)
         if self.time_basis not in ('relative','unix'):
             raise ValueError('time_basis must be relative or unix')
         for value in (self.start_s,self.end_s):
@@ -112,7 +117,9 @@ def _validate_mapping(mapping,database):
             signal=next(s for s in message.signals if s.name==name)
         except (KeyError,StopIteration) as error:raise ValueError('mapping references an absent DBC signal') from error
         expected='rpm' if target=='rpm' else CANONICAL_UNITS[target]
-        if signal.unit!=expected:
+        # Explicit conventional spelling alias, not a magnitude-based conversion.
+        declared_unit={'kph':'km/h'}.get(signal.unit,signal.unit)
+        if declared_unit!=expected:
             raise ValueError(f'{name}: explicit canonical mapping requires DBC unit {expected!r}; got {signal.unit!r}')
         targets.add(target);result[identifier,name]=target
     return result
@@ -141,7 +148,7 @@ def investigate_candump(source,dbc_source,*,mapping=None,config=None,source_meta
         if expected_hashes is not None and (source_hash!=expected_hashes['source'] or dbc_hash!=expected_hashes['dbc']):
             raise ValueError('source/DBC hash does not match the documented source manifest')
         text=dbc_stream.read().decode('utf-8-sig')
-        database=load_classical_dbc(text)
+        database=load_classical_dbc(text,frame_ids=config.dbc_frame_ids)
         if sum(len(m.signals) for m in database.messages)>10000:
             raise ValueError('DBC signal-definition budget exceeded')
         definitions={str(m.frame_id):_definition(m) for m in database.messages}
@@ -219,7 +226,7 @@ def investigate_candump(source,dbc_source,*,mapping=None,config=None,source_meta
                  for column,(target,unit) in COLUMNS.items()}
         for (identifier,name),target in mappings.items():
             unit='rpm' if target=='rpm' else CANONICAL_UNITS[target]
-            signals[target]={'source_column':CORE_SOURCE.get(target,'engine_rpm'),'source_unit':unit,'canonical_unit':unit,
+            signals[target]={'source_column':CORE_SOURCE.get(target,'engine_rpm'),'source_unit':database.get_message_by_frame_id(identifier).get_signal_by_name(name).unit,'canonical_unit':unit,
                              'unit_status':'dbc_declared','meaning_status':'user_mapping_not_independent_physical_verification',
                              'present':True,'frame_id':identifier,'dbc_signal':name}
         metadata={'schema':'can-lab-recording-1','data_kind':'decoded_raw_can','source_filename':source_info['name'],
@@ -230,6 +237,8 @@ def investigate_candump(source,dbc_source,*,mapping=None,config=None,source_meta
             'normalized_time_basis':config.time_basis,'time_interpretation_status':'profile_declared_candump_seconds',
             'source_columns':['time','frame_ref']+list(dict.fromkeys(spec['source_column'] for spec in signals.values() if spec['present'])),
             'can_definitions':definitions,
+            'can_dbc_scope':{'selected_frame_ids':list(config.dbc_frame_ids) if config.dbc_frame_ids else None,
+                'note':'Original DBC bytes/hash retained; only explicitly selected messages are eligible for decoding. Unselected IDs count as unknown in this scope.'},
             'can_frames':[{**asdict(entry.frame),'status':entry.status,'message':entry.message,'decoded_signals':entry.signals} for entry in frames],
             'can_source':source_info,'can_dbc':dbc_info,'can_mapping':mapping or [],'can_references':references,
             'temporal_alignment':'one observation per decoded frame; no merge, fill, resampling or cross-frame simultaneity',
@@ -266,7 +275,7 @@ def investigate_candump(source,dbc_source,*,mapping=None,config=None,source_meta
 def check_references(investigation,references):
     if not isinstance(references,dict) or references.get('dbc_sha256')!=investigation.dbc['sha256']:
         raise ValueError('reference evidence must bind the exact DBC SHA-256')
-    if references.get('evidence_kind') not in ('synthetic_manual_vectors','independent_reference_measurements'):
+    if references.get('evidence_kind') not in ('synthetic_manual_vectors','documented_dbc_vectors','independent_reference_measurements'):
         raise ValueError('reference evidence kind must be explicit')
     if not isinstance(references.get('source'),str) or not references['source']:
         raise ValueError('reference source/method must be documented')
