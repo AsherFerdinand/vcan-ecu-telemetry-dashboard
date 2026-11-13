@@ -10,6 +10,7 @@ behaviour. Company inspirations in [Workflows](WORKFLOWS.md) are not affiliation
 | v0.4 | Implemented foundation, synthetic-validated; real-data gate blocked | Independent real-recording / matching-DBC validation |
 | v0.4.5 | Interactive workbench implemented | Offline teaching experiments, quiz and existing data workflows; independent physical evidence remains pending |
 | v0.4.6 | Visual studio implemented | Standard frame/CRC, wired-AND identifier arbitration, ideal differential illustration, bounded event-driven topology |
+| v0.4.7 | Automotive visual experience implemented | Native themes, inline card illustrations, path-driven broadcast visualization and passive safety/local sensors |
 | v0.5 | Planned | Measured event/anomaly detection performance |
 | v0.6 | Planned | Chronological held-out forecasting evaluation |
 | v0.7 | Planned | Logged, human-reviewed AI tool orchestration compared with scripted automation |

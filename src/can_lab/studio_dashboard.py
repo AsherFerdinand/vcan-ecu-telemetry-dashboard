@@ -127,6 +127,6 @@ def vehicle_lab(experiment=None,key='vehicle_play'):
     st.caption('Shared CAN_H/CAN_L segment · two 120 Ω end terminations ⓘ · Click an ECU or bus to inspect. Dashed local links are not CAN nodes; pulses denote actual retained events, not propagation speed.',help='Conventional high-speed CAN uses two end terminations to reduce reflections. This is not an electrical solver. Per-ECU reception is modeled broadcast observability backed by one python-can receiver.')
     def render(index,playing,reduced):
         event=inspect_event(experiment,index);st.session_state['_current_'+key]=event
-        components.html(topology_html(experiment,event,playing=playing,reduced=reduced),height=650,scrolling=True)
+        components.html(topology_html(experiment,event,playing=playing,reduced=reduced,theme=st.session_state.get('_appearance','dark'),pulse_period=1/st.session_state.get(key+'_speed',2.0)),height=710,scrolling=True)
         with st.expander('Current message and reception evidence',expanded=False):st.json(event)
     player(key,len(experiment['events']),render)

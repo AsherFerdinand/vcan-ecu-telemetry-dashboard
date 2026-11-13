@@ -1,4 +1,4 @@
-# Visual CAN Engineering Studio — v0.4.6
+# Automotive Visual Experience — v0.4.7
 
 The existing Streamlit application now opens on **Overview**, with a compact tab-style
 navigation bar and dark navy branding, a light workspace, restrained orange accents, technical labels and
@@ -28,6 +28,102 @@ Native controls retain keyboard operation and focus outlines. Bit highlights use
 underlines as well as colour, and an accessible table includes every byte and
 selected bit number. The layout was inspected at 1440×1080 and 1024×768 in Linux
 Chromium. This is not a formal accessibility audit or native Windows/macOS test.
+
+## Automotive visual experience
+
+### Appearance and overview
+
+Use the native **⋮ menu → Light / Dark** picker, then **Appearance → Apply
+appearance** to synchronize custom CSS/SVG with the selected native theme.
+Streamlit owns the widget, table and chart theme; VCAN reads `st.context.theme`
+and stores its applied appearance within the session. The explicit Apply step
+handles Streamlit's documented theme-context update delay without private frontend
+APIs or global server configuration changes. Session/browser theme choice persists
+while navigating. Light remains available; no custom theme service is required.
+
+Six compact overview cards now have original inline SVG illustrations, one-sentence
+purposes, capability labels, actions and hover/focus feedback. No remote images or
+fonts are required. Communication is cyan/blue, TX orange, modeled RX green,
+threshold evidence red and local sensor/control connections purple. Labels also
+convey each state; colour is not the sole identifier.
+
+![Actual dark overview with six original module illustrations](images/experience-overview.jpg)
+
+### Vehicle layout and communication
+
+The original top-down EV sketch positions a front motor/controller, VCU, cluster,
+underfloor battery/BMS, ABS/ESC, airbag controller, four wheel-speed inputs and two
+illustrative crash sensors. This is an illustrative, adaptable layout, not a Tesla
+or universal production architecture. Publisher component positions/branches live
+in the declarative `visual_model.LAYOUT`; changing a layout requires reviewing the
+associated local sensing/power illustration as well, not treating it as OEM CAD.
+
+**Exactly four simulated publishers remain.** Brake ECU is presented as passive
+ABS/ESC; the additional airbag controller and all sensors are passive illustration.
+Wheel-speed links terminate locally at ABS/ESC, crash sensing locally at airbag
+control, pack sensing at BMS and the motor at its controller. Purple dashed links
+are local schematic harnesses, not extra CAN nodes or a newly implemented sensor
+protocol. No crash, braking, airbag deployment or sensor physics is introduced.
+
+The gold CAN_H and blue CAN_L form one broadcast segment with two 120-ohm end
+terminations. Branch crossing bridges distinguish an unconnected crossing from a
+junction. Compact labels keep the drawing clear; click or press Enter/Space on an
+ECU, sensor or bus for responsibilities, message IDs/periods and activity.
+
+TX branch, both bus directions and receiver branches use SVG `animateMotion`.
+The **same path geometry** draws each conductor and drives its pulse; receiver
+paths are traversed in reverse. The visual event is checked against retained ID,
+index, transmitter, timestamp and payload before animation. No random traffic or
+new CAN frames are generated. Individual receiver pulses represent observability
+of **the same frame**, not additional transmissions. New passive observations are
+visual assumptions, not extra receiver queues in the original event model.
+
+One visual cycle fits the chosen playback interval: 20% TX stub, 40% shared bus,
+40% receiver stubs, then receive highlighting. These percentages are storytelling
+stages, **not propagation-time, bus occupancy, latency or bitrate calculations**.
+Pause fixes the selected event; returning to play rebuilds its schematic cycle.
+Step/Previous/Reset select actual retained events and reset the scene. Paused and
+manual reduced-motion views show static evidence without motion. OS reduced-motion
+preference also hides/stops motion. No independent animation loop creates traffic.
+
+![Actual dark vehicle component with local sensors and passive safety electronics](images/experience-vehicle.jpg)
+
+### Fault presentation
+
+Threshold crossings colour the original injected arrival evidence; missing-message
+views add a dashed **expected release — not an observed CAN frame** annotation.
+Signal discontinuities identify affected retained event indices and preserve the
+previous/current decoded values and rate calculation. A known original synthetic
+Powertrain ECU / 0x100 maps explicitly to the motor-controller illustration. Expand
+**Mapped network evidence** to inspect its highlighted component using an actual
+source event. Missing traffic never generates a replacement message. Where no
+explicit mapping exists, a limitation is displayed rather than guessing from an ID.
+A red rule finding remains evidence, not a physical ECU-failure diagnosis.
+
+### Portfolio recording sequences
+
+No GIF was generated. Suggested short manual recordings, starting from the same
+installed checkout (choose a theme and Apply first):
+
+1. **CAN Frame Laboratory (about 15 seconds).** Overview → Frame Laboratory.
+   Confirm 0x257 / `38 AD 21 03 0E 00 00 00` → raw 538 → 3.04 km/h. Open advanced
+   CRC/stuffing, then replace AD with BD, press Enter and show 3.12 km/h. Reset the
+   verified example. Keep the field diagram and bit inspector in the recording.
+2. **Vehicle propagation (about 20 seconds).** Overview → Virtual CAN Network →
+   Vehicle topology. Set playback to **0.50 items/s**, Start and show the orange
+   TX stub, cyan shared-bus pulses and green receiver observations. Pause; inspect
+   FL speed and Airbag by click or keyboard. Step, Previous, Reset. Narrate that
+   these are schematic pulses of retained events and that added safety nodes are
+   passive illustration, not newly simulated traffic.
+3. **Arbitration (about 15 seconds).** Vehicle Network → Arbitration, default IDs
+   0x120 / 0x124 / 0x3E0. Reset. Step once to identifier bit 9 and show cluster loss.
+   Step seven more times to identifier bit 2 and show BMS loss / 0x120 winner. Previous, then
+   Reset. Explain normal priority contention, not a communication error or modeled
+   wire occupancy. Use manual steps/reduced motion for a controlled narration.
+
+Capture only the relevant application region; no large GIF/archive is needed.
+Native Windows install, Chromium/Edge SVG/SMIL behaviour, focus handling, OS reduced
+motion and laptop scaling still need a native-host validation record.
 
 ## Visual studio experiments
 
@@ -98,7 +194,7 @@ Manual reduced-motion mode disables automatic playback and CSS motion also respe
 Fault Investigation adds normal/injected arrival timelines side by side using the
 same generator, while preserving all previous threshold evidence and source events.
 
-Current actual Linux Chromium capture (historical v0.4.5 screenshots follow below):
+Historical v0.4.6 Linux Chromium capture (retained engineering evidence; current v0.4.7 screenshots are above):
 
 ![Visual studio vehicle topology driven by the retained deterministic event](images/studio-vehicle.jpg)
 

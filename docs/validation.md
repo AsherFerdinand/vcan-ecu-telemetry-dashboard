@@ -807,3 +807,101 @@ The staged revision's read-only inventory contained 104 tracked files totaling
 approximately **0.85 MB**, including the new **38.50 KB** screenshot. Historical
 ignored outputs remained **484.21 KB**. No new runtime dependency was introduced;
 the verification wheel was **107.16 KB** and remained outside Git.
+
+## v0.4.7 Automotive Visual Experience — 2026-11-13
+
+Started at `07b55e68274cc3e412c4c3414bf9f366be0a4463`, preserving the visual-studio
+branch. New development is isolated on `feat/automotive-visual-experience`.
+This is a presentation/interaction milestone. The CAN/DBC, CRC-15, stuffing,
+arbitration, differential calculations, event generator, fault rules and telemetry
+analysis core were not rewritten. All 366 preceding passing tests remain intact.
+
+### Implementation and boundaries
+
+- Native Streamlit Light/Dark themes handle controls, charts and tables. The
+  Appearance popover documents **⋮ → Light/Dark → Apply appearance**; Apply reads
+  the public theme context and stores matching custom CSS/SVG tokens per session.
+  It avoids private frontend theme APIs or global server-side theme mutation.
+  This explicit synchronization accommodates the framework's theme-context delay.
+- Six overview cards now include original inline SVG illustrations, concise
+  descriptions/status, actions and hover/keyboard-focus feedback. No new assets
+  are loaded from remote services. Light remains available.
+- The original vehicle SVG is now a top-down illustrative EV with motor/controller,
+  VCU, cluster, pack/BMS, passive ABS/ESC and passive airbag control. Four wheel-speed
+  sensors connect locally to ABS/ESC; illustrative crash sensors connect locally
+  to the restraint controller. Purple dashed paths are local harness/control
+  illustrations, not CAN publishers or sensor/firmware physics.
+- Exactly four simulated publishers remain. New safety/sensor objects do not
+  generate CAN traffic. A single paired bus with two end terminations remains a
+  broadcast segment. Additional passive reception is illustration/model assumption,
+  not new per-node queues or independently verified vehicle topology.
+- `visual_model` checks original event ID, payload, index, transmitter and timestamp,
+  then provides the same paths for drawn conductors and animated markers. Motion
+  stages TX branch, both bus directions and reverse receiver stubs; receiver
+  flashes describe observability of the SAME frame. No random traffic is generated.
+  Staging percentages are visual narrative, not propagation time, bitrate or wire
+  occupancy. Pause/Step/Previous/Reset preserve the selected retained event; scenes
+  restart their schematic cycle rather than preserving a physical wave position.
+- Manual and OS reduced-motion preferences suppress wire motion. Native Python
+  playback still owns event selection. SVG/SMIL renders only the selected cycle;
+  no independent timer generates messages or grows an event buffer.
+- Fault views mark threshold evidence and expected-but-unobserved release annotations
+  without synthesizing packets. Signal-rate points are highlighted. Only the known
+  synthetic Powertrain ECU / 0x100 is explicitly mapped to the motor-controller
+  illustration; other cases report a limitation rather than inferring meaning
+  from an arbitrary ID. Mapped diagrams use an actual source observation and retain
+  all finding/event references. A red highlight is not a hardware-failure diagnosis.
+
+### Executed verification
+
+- Full suite: **375 passed, 1 skipped**, 18.06 s. New tests cover passive-node
+  classification, unchanged publisher count/evidence, rejection of fabricated
+  visual IDs/payloads, exact wire/motion path reuse, event-change/reset state,
+  reduced motion, themes/icons and supported/unsupported fault mappings.
+- The optional external KUKSA integration passed separately (**1 passed**, 2.34 s)
+  using retained inputs; no research download was needed. The original virtual CAN
+  demo processed **20 samples, zero flagged**. Locked runtime dependencies are
+  unchanged; `pip check` passed. Default CI remains dataset-free.
+- Running Linux Chromium/Playwright checks selected native Light and Dark and
+  applied matching custom visuals, navigated via Overview actions, inspected a
+  wheel sensor and passive airbag node by keyboard/pointer, exercised Start/Pause/
+  Step/Previous/Reset and manual reduced motion, and verified missing-release
+  component evidence. Light-mode frame decoding still displayed 3.04 km/h.
+- Actual SVG motion was sampled on the drawn MCU branch: scene-clock samples near 0.05/0.20 s moved
+  from approximately (364, 140) to (375–378, 140), remaining on the original
+  conductor. The SVG clock continues during browser command round trips. These are
+  SVG coordinates/animation times, not physical propagation measurements.
+- Desktop 1440×1180 and laptop 1024×768 were checked; no document-level horizontal
+  overflow or JavaScript/Streamlit exceptions occurred. Pause was checked after
+  waiting beyond the selected event interval. Native Windows/macOS, assistive
+  technology and formal contrast/usability audits remain outstanding.
+- The two current screenshots are genuine browser captures: dark overview and the
+  selected-event vehicle component. They are documentation evidence, not generated
+  mockups. Historical screenshots were retained. Three exact portfolio sequences
+  are documented in the guide; no GIF was generated.
+
+### Storage and next steps
+
+Starting tracked content was approximately **0.85 MB**. Historical ignored outputs
+remain **484.21 KB** across 29 files. New screenshots are **99.50 KB** and
+**44.48 KB** (**143.98 KB** combined). Calculations and manifests retain exact
+byte counts; user-facing summaries use decimal units with two decimals. Inline
+SVG/CSS and the existing component are used without a new runtime dependency,
+frontend framework, data copy, persistent cache, archive or automatic plot export.
+No historical engineering evidence was deleted.
+
+Before advertising native Windows support, check the locked installation, native
+browser appearance menu/context synchronization, SVG/SMIL timing/focus, reduced
+motion, laptop scaling and original CAN/Excel workflows on that host. The layout
+is an adaptable illustration, not OEM CAD or a production architecture. Physical
+propagation, bus occupancy, EMC, braking/crash dynamics and real firmware remain
+outside scope. The original KUKSA independent-physical-validation gate is unchanged.
+
+The built `0.4.7.dev0` wheel also passed isolated offline imports, unchanged
+four-publisher event generation, visual-node mapping and the known CRC 0x04CD
+check. Its **112.09 KB** verification package remained outside Git.
+
+Final staged tracked content is approximately **1.03 MB**, including the two new
+requested screenshots. Ignored historical outputs remain **484.21 KB**; no runtime
+dependency was added. The exact revision inventory is reproducible with the
+read-only storage audit.

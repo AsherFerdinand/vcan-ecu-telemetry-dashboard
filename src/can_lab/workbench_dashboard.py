@@ -35,15 +35,16 @@ def overview():
            ('Raw CAN Investigation','CLASSICAL CAN · CANDUMP','Real-data demonstrated / Level 2','Trace source-reported vehicle frames to DBC signals; physical validation pending.','Vehicle data','Raw CAN Investigation (v0.4 foundation)'),
            ('EV Telemetry & Diagnostics','DECODED WORKBOOK · RECORDING','Implemented / source-qualified','Review quality, replay, operating states, cell indicators and requested reports.','Vehicle data','Real-World EV Dataset'),
            ('Learning Laboratory','CAN · ENGINEERING REASONING','Implemented / local','Explore a practical FAQ and test your understanding with explained answers.','Learn CAN',None)]
+    from .workbench_style import overview_icon
     for start in (0,3):
-        for column,card in zip(st.columns(3),cards[start:start+3]):
+        for icon_index,(column,card) in enumerate(zip(st.columns(3),cards[start:start+3]),start):
             name,protocol,status,description,page,source=card
             with column:
-                with st.container(border=True):
-                    st.caption(protocol)
+                with st.container(border=True,key=f'module_card_{icon_index}'):
+                    st.markdown(overview_icon(icon_index),unsafe_allow_html=True)
                     st.subheader(name)
                     st.write(description)
-                    st.caption(status)
+                    st.markdown('<span class="capability">'+status+'</span>',unsafe_allow_html=True)
                     st.button('Open '+name,key='open_'+page+str(source),on_click=open_page,args=(page,source),width='stretch')
     st.info('Real vehicle CAN decoding demonstrated at DBC interpretation Level 2; independent physical validation pending. The KUKSA capture/date attribution and licensing caveats remain documented.')
     st.caption('Raw frames → explicit DBC → sparse Recording → quality and engineering → requested reports. Already-decoded EV telemetry enters at Recording. Teaching experiments are not real vehicle topology or a production anomaly detector.')
@@ -220,10 +221,26 @@ def fault_lab():
         for column,label,experiment in ((a,'Normal operation',normal),(b,'Injected operation',result)):
             with column:
                 st.caption(label+' · scheduled arrivals')
-                st.altair_chart(alt.Chart(pd.DataFrame(experiment['events'])).mark_tick(size=25).encode(x=alt.X('timestamp_ms:Q',title='Logical ms'),tooltip=['timestamp_ms','payload_hex']),width='stretch')
+                marked={finding['evidence_indices'][-1] for finding in evidence if finding['exceeded'] and finding['evidence_indices']} if label=='Injected operation' else set()
+                arrivals=pd.DataFrame(experiment['events'])
+                arrivals['visual_status']=['Threshold evidence' if index in marked else 'Retained event' for index in arrivals['index']]
+                arrival_chart=alt.Chart(arrivals).mark_tick(size=25).encode(x=alt.X('timestamp_ms:Q',title='Logical ms'),
+                    color=alt.Color('visual_status:N',scale=alt.Scale(domain=['Retained event','Threshold evidence'],range=['#39bcd4','#e56666'])),
+                    tooltip=['index','timestamp_ms','nominal_release_ms','payload_hex','visual_status'])
+                if label=='Injected operation' and scenario=='Missing message':
+                    missing=[finding for finding in evidence if finding['kind']=='missing_message' and finding['last_received_ms'] is not None]
+                    if missing:
+                        annotation=pd.DataFrame([{'timestamp_ms':finding['last_received_ms']+finding['expected_period_ms'],'note':'Expected release — NOT an observed CAN frame'} for finding in missing])
+                        arrival_chart=arrival_chart+alt.Chart(annotation).mark_rule(color='#e56666',strokeDash=[4,4]).encode(x='timestamp_ms:Q',tooltip=['note','timestamp_ms'])
+                st.altair_chart(arrival_chart,width='stretch')
         frame=pd.DataFrame(result['events'])
-        st.altair_chart(alt.Chart(frame).mark_line(point=True).encode(x=alt.X('timestamp_ms:Q',title='Logical timestamp (ms)'),
-            y=alt.Y('speed_kmh:Q',title='Original synthetic speed (km/h)'),tooltip=['index','timestamp_ms','speed_kmh']),width='stretch')
+        signal_chart=alt.Chart(frame).mark_line(point=True).encode(x=alt.X('timestamp_ms:Q',title='Logical timestamp (ms)'),
+            y=alt.Y('speed_kmh:Q',title='Original synthetic speed (km/h)'),tooltip=['index','timestamp_ms','speed_kmh'])
+        if scenario=='Signal discontinuity':
+            changes={finding['evidence_indices'][-1] for finding in evidence if finding['kind']=='signal_rate' and finding['exceeded']}
+            signal_chart=signal_chart+alt.Chart(frame[frame['index'].isin(changes)]).mark_point(color='#e56666',size=110).encode(x='timestamp_ms:Q',y='speed_kmh:Q',tooltip=['index','timestamp_ms','speed_kmh'])
+            st.caption('Signal-rate evidence at retained event indices: '+', '.join(map(str,sorted(changes)))+' · inspect previous/current decoded values and rate below.')
+        st.altair_chart(signal_chart,width='stretch')
         kind={'Missing message':'missing_message','Timing irregularity':'timing','Signal discontinuity':'signal_rate'}[scenario]
         selected=[item for item in evidence if item['kind']==kind]
         st.metric('Selected-rule threshold exceedances',sum(item['exceeded'] for item in selected))
@@ -231,7 +248,23 @@ def fault_lab():
             st.dataframe(pd.DataFrame(selected),hide_index=True,width='stretch')
             if st.session_state.get('fault_evidence',0) not in range(len(selected)):st.session_state['fault_evidence']=0
             inspected=st.selectbox('Inspect diagnostic evidence',range(len(selected)),format_func=lambda index:f"Finding {index} · {'threshold exceeded' if selected[index]['exceeded'] else 'within threshold'}",key='fault_evidence')
-            finding=selected[inspected];st.json(finding)
+            finding=selected[inspected]
+            from .visual_model import fault_visual
+            visual=fault_visual(result,finding)
+            st.session_state['_fault_visual']=visual
+            if visual['mapped']:
+                color='#f07373' if visual['exceeded'] else '#60dca1'
+                st.markdown(f'<div style="border-left:4px solid {color};padding:10px"><b>{visual["component"]} · {visual["label"]}</b><br/>Source event indices: {visual["evidence_indices"]}<br/>{visual["qualification"]}</div>',unsafe_allow_html=True)
+            else:st.info(visual['limitation'])
+            if visual['mapped'] and visual['evidence_indices']:
+                with st.expander('Mapped network evidence'):
+                    from .studio_playback import inspect_event
+                    from .studio_diagrams import topology_html
+                    import streamlit.components.v1 as components
+                    actual=inspect_event(result,visual['evidence_indices'][-1])
+                    st.caption('Selected rule evidence; pictured packet is an actual retained observation. No missing packet is synthesized.')
+                    components.html(topology_html(result,actual,theme=st.session_state.get('_appearance','dark'),fault=visual),height=710,scrolling=True)
+            st.json(finding)
             st.json([result['events'][index] for index in finding['evidence_indices']])
         else:st.info('The selected rule did not produce evidence above the configured threshold within this observation horizon.')
         with st.expander('Explain this result'):

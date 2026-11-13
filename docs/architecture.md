@@ -316,3 +316,23 @@ injections and evidence; normal/injected timelines add presentation only.
 units; exact integers remain in audit calculations, JSON evidence and manifests.
 No new runtime dependency, dataset, rendering service or full frontend migration
 was introduced. See [studio conventions](workbench.md#visual-studio-experiments).
+
+
+## Automotive visual experience (v0.4.7)
+
+The numerical CAN/DBC/CRC/stuffing/arbitration/differential and event-generation
+modules are unchanged. `visual_model.py` maps a verified retained event onto a
+declarative layout. It distinguishes four publishers from passive safety/sensor
+illustrations, supplies the exact wire paths used for drawing and motion, and
+contains an explicit narrow fault-to-component mapping with a limitation fallback.
+No presentation code adds messages to the experiment or alters its evidence.
+
+`studio_diagrams.topology_html` stages SVG path motion inside the existing isolated
+component. The native Python playhead remains the only event selector; no random
+JS traffic, background service or frontend framework was added. Native OS/manual
+reduced motion suppresses animation. A rebuilt scene starts from its selected
+event, not a preserved physical propagation position. Node/sensor inspection is
+local to the component. `workbench_style` supplies small inline card icons and
+custom surface tokens. Streamlit's native theme picker handles tables/charts/
+controls; Apply appearance synchronizes Python context/custom visuals per session.
+Both native light and dark palettes are configured in `.streamlit/config.toml`.

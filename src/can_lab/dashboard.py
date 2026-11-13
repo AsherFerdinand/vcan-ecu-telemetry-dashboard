@@ -1,11 +1,16 @@
 """Run with: python -m streamlit run src/can_lab/dashboard.py"""
 import streamlit as st
 from can_lab import __version__
-from can_lab.workbench_style import STYLE
+from can_lab.workbench_style import appearance_style
 from can_lab.workbench_dashboard import PAGES,overview,frame_lab,network_lab,fault_lab,learn_can
 
 st.set_page_config(page_title='VCAN · Engineering Workbench',layout='wide')
-st.markdown(STYLE,unsafe_allow_html=True)
+appearance=st.context.theme.type or st.session_state.get('_appearance','dark')
+st.session_state['_appearance']=appearance
+st.markdown(appearance_style(appearance),unsafe_allow_html=True)
+with st.popover('Appearance'):
+    st.caption('Choose Light or Dark in the native ⋮ menu (Light / Dark). It also themes charts, tables and controls. Then apply to synchronize the custom diagrams.')
+    st.button('Apply appearance',key='apply_appearance')
 st.markdown('<div class="studio-brand">VCAN <span>VISUAL CAN ENGINEERING STUDIO</span></div>',unsafe_allow_html=True)
 from can_lab.studio_dashboard import pause_players as stop_playback
 

@@ -14,42 +14,69 @@ def frame_html(frame,selected):
     return '<div class="frame-grid" aria-label="Standard classical data frame and following intermission">'+''.join(cells)+'</div>'
 
 
-def topology_html(experiment,event,*,playing=False,reduced=False):
-    """Isolated component contract: immutable experiment + inspected event → HTML.
-
-    JS only selects a local information panel. Simulation and playback remain Python.
-    Pulses denote the current actual event, not calculated signal propagation.
-    """
-    nodes=[node['name'] for node in experiment['nodes']]
-    if experiment.get('studio_vehicle'):nodes+=['Brake ECU']
-    active=event['node']
-    positions=[(190,115),(190,285),(530,115),(530,285),(530,410)]
-    svg=['<svg viewBox="0 0 720 500" role="img" aria-label="Educational vehicle, one shared terminated differential CAN bus">',
-         '<rect x="100" y="20" width="520" height="440" rx="100" fill="#f1f4f7" stroke="#889aab" stroke-width="3"/>',
-         '<path d="M130 70h-35v80h35M130 330H95v80h35M610 70h35v80h-35M610 330h35v80h-35" stroke="#182c40" stroke-width="16" fill="none"/>',
-         '<rect x="235" y="180" width="95" height="60" rx="12" fill="#d8e7de" stroke="#337451"/><text x="282" y="205" text-anchor="middle" font-size="12">Battery pack</text>',
-         '<circle cx="360" cy="60" r="24" fill="#d7e5ed" stroke="#426173"/><text x="360" y="64" text-anchor="middle">Motor</text>',
-         '<path d="M336 60H300V105H273M282 240V250H190V257" stroke="#54677a" stroke-dasharray="5 4" stroke-width="2" fill="none"/><text x="282" y="225" text-anchor="middle" font-size="8">local BMS sensing</text>',
-         '<g data-node="BUS" tabindex="0" role="button" aria-label="Inspect CAN bus"><path d="M345 100V430" stroke="#966b00" stroke-width="5"/><path d="M375 100V430" stroke="#2366be" stroke-width="5"/><path d="M345 100H355l3 -6 5 12 5 -12 5 6h2M345 430h10l3 -6 5 12 5 -12 5 6h2" fill="none" stroke="#223548" stroke-width="2"/><text x="385" y="108" font-size="11">120 Ω</text><text x="385" y="439" font-size="11">120 Ω</text><text x="335" y="375" text-anchor="end" fill="#765400">CAN_H</text><text x="385" y="395" fill="#174d94">CAN_L</text></g>']
-    info={'BUS':{'name':'One shared high-speed CAN segment','details':'Paired CAN_H/CAN_L; 120-ohm termination across the pair at each end. Broadcast, not point-to-point routing. Ideal wiring illustration, not an electrical solver. Standard arbitration and differential signalling have separate labs.'}}
-    for index,name in enumerate(nodes):
-        x,y=positions[index];left=x<360;busx=345 if left else 375
-        status='TRANSMITTING' if name==active else 'BROADCAST OBSERVER (MODEL)'
-        fill='#fff0dd' if name==active else '#e2f3e9'
-        edge=x+83 if left else x-83
-        high=f'M{edge} {y-5}H345' if left else f'M{edge} {y-5}H381Q375 {y-11} 369 {y-5}H345'
-        low=f'M{edge} {y+5}H339Q345 {y-1} 351 {y+5}H375' if left else f'M{edge} {y+5}H375'
-        svg.append(f'<path d="{high}" stroke="#966b00" stroke-width="2" fill="none"/><path d="{low}" stroke="#2366be" stroke-width="2" fill="none"/><circle cx="345" cy="{y-5}" r="3" fill="#966b00"/><circle cx="375" cy="{y+5}" r="3" fill="#2366be"/><g data-node="{index}" tabindex="0" role="button" aria-label="Inspect {html.escape(name,quote=True)}"><rect x="{x-83}" y="{y-28}" width="166" height="56" rx="8" fill="{fill}" stroke="#a9430b" stroke-width="{3 if name==active else 1}"/><text x="{x}" y="{y-5}" text-anchor="middle" font-size="11">{html.escape(name)}</text><text x="{x}" y="{y+14}" text-anchor="middle" font-size="9">{status}</text></g>')
-        published=[node for node in experiment['nodes'] if node['name']==name]
-        info[str(index)]={'name':name,'activity':status,'publishes':[{'id':hex(node['frame_id']),'period_ms':node['period_ms']} for node in published],
-            'observed_message':hex(event['frame_id']) if name!=active else 'own transmission; no loopback receipt asserted',
-            'responsibility':{'Motor controller':'Controls motor torque/speed; original synthetic engine payload only here.','Battery Management System':'Monitors pack conditions; original synthetic temperature payload only here.','Vehicle Control Unit':'Coordinates vehicle requests; teaching payload is uninterpreted.','Instrument cluster':'Presents driver information; publishes an uninterpreted teaching message.','Brake ECU':'Collects local wheel-speed/brake information; passive CAN observer in this version.'}.get(name,'Educational publisher; not production firmware or vehicle-specific topology.')}
-    svg.append('<circle cx="610" cy="202" r="12" fill="#d9e7f0"/><text x="610" y="225" text-anchor="middle" font-size="10">wheel sensor</text><path d="M610 214V380H530V382" stroke="#54677a" stroke-dasharray="5 4" fill="none"/><text x="595" y="245" text-anchor="middle" font-size="9">local ECU link</text>')
-    # Wheel-speed sensing terminates at the passive Brake ECU, not a CAN node.
-    svg.append(f'<circle class="pulse" cx="360" cy="{positions[nodes.index(active)][1]}" r="10" fill="#a9430b"/><text x="360" y="483" text-anchor="middle" font-size="12">EVENT {event["index"]} · {event["timestamp_ms"]} ms · ID 0x{event["frame_id"]:03X} · {html.escape(event["payload_hex"])}</text></svg>')
+def topology_html(experiment,event,*,playing=False,reduced=False,theme='light',pulse_period=0.5,fault=None):
+    """Original SVG; paths used for wiring and pulses come from the same view model."""
+    from .visual_model import visual_event
+    view=visual_event(experiment,event)
+    period=max(.25,min(2,float(pulse_period)))
+    dark=theme=='dark'
+    bg,surface,ink,muted,border=('#0b1220','#162235','#edf3fb','#b1c1d4','#536b87') if dark else ('#f5f7fa','#ffffff','#162638','#425a70','#91a4b8')
+    cyan,orange,green,purple='#39cce4','#ff9b51','#60dca1','#b89aff'
+    svg=['<svg id="vehicle" viewBox="0 0 900 620" role="img" aria-label="Illustrative EV architecture, shared terminated CAN pair, four publishers and passive safety electronics">',
+        f'<path d="M320 25Q450 5 580 25Q650 55 650 150V490Q640 580 560 590H340Q260 580 250 490V150Q250 55 320 25Z" fill="{surface}" stroke="{border}" stroke-width="3"/>',
+        f'<path d="M325 195Q450 175 575 195L605 305H295Z M295 420H605L580 535H320Z" fill="none" stroke="{border}" stroke-width="2"/>',
+        '<path d="M250 105H228v90h22M650 105h22v90h-22M250 455h-22v90h22M650 455h22v90h-22" fill="none" stroke="#43546b" stroke-width="14"/>']
+    info={'BUS':{'name':'Shared high-speed CAN segment','details':'CAN_H and CAN_L form one broadcast bus with 120-ohm end terminations. Pulses are schematic, not propagation-time or bitrate simulation. Individual receiver flashes represent observability of the SAME retained frame, not new messages.'}}
+    def component(key,label,x,y,detail,width=70,height=30):
+        info[key]=detail
+        svg.append(f'<g data-node="{key}" role="button" tabindex="0" aria-label="Inspect {html.escape(label,quote=True)}"><title>{html.escape(detail["details"])}</title><rect x="{x-width/2}" y="{y-height/2}" width="{width}" height="{height}" rx="8" fill="{surface}" stroke="{purple}"/><text x="{x}" y="{y+4}" text-anchor="middle" fill="{ink}" font-size="14">{html.escape(label)}</text></g>')
+    component('MOTOR','Motor',450,80,{'name':'Traction motor','details':'Illustrative front-drive layout. Local control/power link to motor controller; not an extra CAN publisher.'},85,40)
+    component('PACK','HV battery',465,382,{'name':'Battery pack','details':'Illustrative underfloor battery. Dashed local sensing link to BMS; no battery voltage/current model is introduced.'},100,155)
+    svg.append(f'<path d="M405 80H300V121M415 382H370V365" stroke="{purple}" stroke-width="2" stroke-dasharray="5 4" fill="none"/>')
+    # One conventional segment; stubs cross the other conductor using explicit bridges.
+    svg.append(f'<g data-node="BUS" role="button" tabindex="0" aria-label="Inspect CAN bus"><title>CAN_H / CAN_L: differential signalling, shared broadcast and two end terminations</title><path d="M390 125V535" stroke="#cda22a" stroke-width="4"/><path d="M410 125V535" stroke="#5d9df4" stroke-width="4"/><path d="M390 125h4l3 -5 3 10 3 -10 3 5h4M390 535h4l3 -5 3 10 3 -10 3 5h4" stroke="{ink}" fill="none"/><text x="418" y="128" fill="{ink}">120 Ω</text><text x="418" y="543" fill="{ink}">120 Ω</text></g>')
+    responsibility={'MCU':'Motor torque/speed control; original synthetic engine payload only here.','BMS':'Pack monitoring; original synthetic temperature message only here.',
+        'VCU':'Vehicle coordination; uninterpreted teaching payload.','Cluster':'Driver information; uninterpreted teaching message.',
+        'ABS / ESC':'Illustrative local wheel-speed collection and brake/stability role. Passive CAN observer, no ABS firmware.',
+        'Airbag':'Illustrative restraint controller and local crash sensing. Passive CAN observer; no crash model or deployment logic.'}
+    for node in view['nodes']:
+        key,x,y=node['key'],node['x'],node['y']
+        for line,color in [('H','#cda22a'),('L','#5d9df4')]:
+            svg.append(f'<path id="branch-{key}-{line}" d="{view["paths"][key][line]}" stroke="{color}" stroke-width="2" fill="none"/><circle cx="{390 if line=="H" else 410}" cy="{y+(-5 if line=="H" else 5)}" r="3" fill="{color}"/>')
+        status='TX' if node['active'] else 'RX model' if node['publisher'] else 'Passive'
+        flagged=bool(fault and fault.get('mapped') and fault.get('exceeded') and node['role']==fault.get('component'))
+        if flagged:status='THRESHOLD EVIDENCE'
+        stroke='#f07373' if flagged else orange if node['active'] else border if playing and not reduced else green
+        receive_set=f'<set attributeName="stroke" to="{green}" begin="{period*.9:.3f}s" fill="freeze"/>' if playing and not reduced and not node['active'] else ''
+        svg.append(f'<g data-node="{key}" role="button" tabindex="0" aria-label="Inspect {html.escape(node["name"],quote=True)}"><title>{html.escape(responsibility[node["label"]])}</title><rect x="{x-60}" y="{y-24}" width="120" height="48" rx="8" fill="{surface}" stroke="{stroke}" stroke-width="{3 if node["active"] else 1.5}">{receive_set}</rect><text x="{x}" y="{y-3}" text-anchor="middle" fill="{ink}" font-size="14">{node["label"]}</text><text x="{x}" y="{y+14}" text-anchor="middle" fill="{muted}" font-size="11">{status}</text></g>')
+        info[key]={'name':node['name'],'role':node['role'],'details':responsibility[node['label']],
+            'activity':status,'fault_evidence':fault if flagged else None,'publishes':[{'id':hex(n['frame_id']),'period_ms':n['period_ms']} for n in experiment['nodes'] if n['name']==node['name']] if node['publisher'] else [],
+            'observes':hex(event['frame_id']) if not node['active'] else 'Own transmission; loopback receipt not asserted'}
+    # Four local wheel inputs terminate at ABS, never directly on CAN.
+    for key,x,y in [('FL',235,155),('FR',665,155),('RL',235,505),('RR',665,505)]:
+        component(key,key+' speed',x,y,{'name':key+' wheel-speed sensor','details':'Illustrative local sensor link to ABS/ESC ECU. Not a CAN node or simulated publisher.'},62,25)
+        route=f'M{x} {y+13}V{560 if y>400 else 570}H620V479'
+        svg.append(f'<path d="{route}" stroke="{purple}" stroke-width="1.5" stroke-dasharray="4 5" fill="none"/>')
+    for key,x in [('CRASH_L',485),('CRASH_R',570)]:
+        component(key,'Crash',x,215,{'name':'Illustrative crash sensor','details':'Local connection to airbag control unit; no CAN publishing, crash dynamics or deployment simulation.'},55,24)
+        svg.append(f'<path d="M{x} 227V280H280V274" stroke="{purple}" stroke-width="1.5" stroke-dasharray="4 5" fill="none"/>')
+    # Staged TX -> both directions of the same segment -> receiver stubs.
+    period=max(.25,min(2,float(pulse_period)));tx=period*.2;bus=period*.4;rx=period*.4
+    animations=[]
+    if playing and not reduced:
+        def pulse(path,start,duration,color,reverse=False):
+            animations.append(f'<circle class="motion" r="4" fill="{color}" opacity="0"><set attributeName="opacity" to="1" begin="{start:.3f}s" dur="{duration:.3f}s"/><animateMotion path="{path}" begin="{start:.3f}s" dur="{duration:.3f}s" fill="freeze" calcMode="linear" keyPoints="{"1;0" if reverse else "0;1"}" keyTimes="0;1"/></circle>')
+        active=next(n for n in view['nodes'] if n['active'])
+        for line,x,dy in [('H',390,-5),('L',410,5)]:
+            pulse(view['paths'][active['key']][line],0,tx,orange)
+            for end in (125,535):pulse(f'M{x} {active["y"]+dy}V{end}',tx,bus,cyan)
+            for key in view['receivers']:pulse(view['paths'][key][line],tx+bus,rx,green,True)
+    svg.extend(animations)
+    svg.append(f'<text x="450" y="610" text-anchor="middle" fill="{ink}">EVENT {event["index"]} · {event["timestamp_ms"]} ms · ID 0x{event["frame_id"]:03X} · {event["payload_hex"]}</text></svg>')
     payload=json.dumps(info).replace('<','\\u003c').replace('>','\\u003e')
-    animation='animation:pulse 1s ease-out infinite;' if playing and not reduced else ''
-    return '''<html><head><style>body{margin:0;font:13px system-ui;color:#162638;background:#f5f6f8}svg{width:100%;max-height:490px}g[data-node]{cursor:pointer}g:focus{outline:3px solid #a9430b}.pulse{'''+animation+'''}@keyframes pulse{from{r:7;opacity:1}to{r:20;opacity:.15}}@media(prefers-reduced-motion:reduce){.pulse{animation:none}}pre{white-space:pre-wrap;background:white;border:1px solid #c1cedb;padding:9px;border-radius:6px;min-height:65px}</style></head><body>'''+''.join(svg)+'''<pre id="info" aria-live="polite">Select an ECU or the paired bus to inspect its role and message activity.</pre><script>const data='''+payload+''';document.querySelectorAll('[data-node]').forEach(n=>{function show(){document.getElementById('info').textContent=JSON.stringify(data[n.dataset.node],null,2)}n.addEventListener('click',show);n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})});</script></body></html>'''
+    motion='true' if playing and not reduced else 'false'
+    decoded=html.escape(json.dumps(event.get('decoded',{})))
+    return f'''<html><head><style>body{{margin:0;background:{bg};color:{ink};font:12px system-ui}}svg{{width:100%;max-height:540px}}.motion{{pointer-events:none}}g[data-node]{{cursor:pointer}}g[data-node]:focus{{outline:3px solid {orange}}}g[data-node]:hover rect{{stroke:{cyan};stroke-width:2.5}}.legend{{display:flex;flex-wrap:wrap;gap:12px;padding:8px}}.info{{background:{surface};border:1px solid {border};border-radius:8px;padding:10px;white-space:pre-wrap;min-height:68px}}@media(prefers-reduced-motion:reduce){{.motion{{display:none}}}}</style></head><body>'''+''.join(svg)+f'''<div class="legend"><span style="color:{orange}">● TX</span><span style="color:{green}">● Modeled RX</span><span style="color:{purple}">┄ Local sensor/control</span><span>CAN_H gold / CAN_L blue</span><span>Decoded: {decoded}</span></div><div id="info" class="info" aria-live="polite">Select an ECU, sensor or shared bus. Extra safety ECUs are passive illustration. Pulse travel is schematic, not physical timing.</div><script>const data='''+payload+''';document.querySelectorAll('[data-node]').forEach(n=>{function show(){document.getElementById('info').textContent=JSON.stringify(data[n.dataset.node],null,2)}n.addEventListener('click',show);n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})});if(!'''+motion+'''||matchMedia('(prefers-reduced-motion: reduce)').matches){document.getElementById('vehicle').pauseAnimations();document.querySelectorAll('.motion').forEach(n=>n.style.display='none')}</script></body></html>'''
 
 
 def arbitration_html(result,index):

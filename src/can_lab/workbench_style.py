@@ -37,3 +37,38 @@ STYLE=STYLE.replace('</style>','''
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media(max-width:1100px){.block-container{padding-left:1rem;padding-right:1rem}h1{font-size:1.45rem!important}}
 </style>''')
+
+
+def appearance_style(theme):
+    """Native Streamlit handles widget/chart themes; match custom surfaces to it."""
+    dark=theme=='dark'
+    bg,surface,ink,muted,border=('#0b1220','#152237','#edf3fb','#b4c5d8','#445b76') if dark else ('#f5f7fa','#ffffff','#162638','#42566c','#b7c5d4')
+    return STYLE+f'''<style>
+    [data-testid="stAppViewContainer"]{{background:{bg};color:{ink}}}
+    h1,h2,h3,[data-testid="stMarkdownContainer"],label{{color:inherit}}
+    [data-testid="stCaptionContainer"] p,.vcan-byte small,.arb-table caption{{color:{muted}}}
+    [data-testid="stVerticalBlockBorderWrapper"],.vcan-byte{{background:{surface};border-color:{border};color:{ink}}}
+    [data-testid="stVerticalBlockBorderWrapper"]{{transition:border-color .12s ease}}
+    [data-testid="stVerticalBlockBorderWrapper"]:hover{{border-color:#39cce4}}
+    [data-testid="stVerticalBlockBorderWrapper"]:focus-within{{outline:2px solid #ff9b51;outline-offset:2px}}
+    .vcan-bit{{color:{muted}}}.vcan-bit.used{{background:#403020;color:#ffcc91;border-color:#ff9b51}}
+    .vcan-kicker{{color:{'#ffb67d' if dark else '#963c09'}}}
+    .frame-cell{{color:#162638}} .arb-table td,.arb-table th{{border-color:{border}}}
+    .arb-table .compared,.arbitration-bits .current{{color:#162638}} .arb-table .lost{{color:#9e2525}}
+    [class*="st-key-module_card_"]{{background:{surface};border:1px solid {border};border-radius:10px;padding:14px}}
+    [class*="st-key-module_card_"]:hover{{border-color:#39cce4}}
+    [class*="st-key-module_card_"]:focus-within{{outline:2px solid #ff9b51}}
+    .card-icon{{height:58px;display:flex;align-items:center;color:#39cce4}}.card-icon svg{{width:100px;height:50px}}
+    .capability{{display:inline-block;padding:3px 7px;border:1px solid {border};border-radius:20px;color:{muted};font:11px ui-monospace,monospace}}
+    </style>'''
+
+
+def overview_icon(index):
+    shapes=[
+        '<rect x="4" y="8" width="90" height="32" rx="4"/><path d="M25 8v32m20-32v32m20-32v32"/><path d="M49 16h10v17H49Z" fill="#ff9b51"/>',
+        '<rect x="30" y="3" width="40" height="44" rx="15"/><path d="M48 8v34M54 8v34M10 15h38m6 20h35"/><rect x="3" y="10" width="17" height="12"/><rect x="78" y="29" width="17" height="12"/>',
+        '<path d="M3 32h22l8-20 8 25 10-9h12l8-21 7 26h19"/><circle cx="71" cy="13" r="10" stroke="#ff9b51"/>',
+        '<rect x="3" y="7" width="50" height="35" rx="4"/><path d="M60 24h32m-8-8 8 8-8 8"/><text x="8" y="29" fill="currentColor" stroke="none" font-size="12">0x257</text>',
+        '<rect x="5" y="10" width="42" height="30" rx="4"/><path d="M47 20h5v10h-5M12 17h8v16h-8m12-16h8v16h-8M60 38V12m0 26h35m-30-8 9-13 9 8 10-18"/>',
+        '<path d="M8 10q20-8 40 0 20-8 40 0v32q-20-8-40 0-20-8-40 0Z M48 10v32 M17 19h21m-21 8h17m25-8h20m-20 8h15"/>']
+    return '<div class="card-icon"><svg viewBox="0 0 100 50" role="img" aria-label="Module illustration" fill="none" stroke="currentColor" stroke-width="2">'+shapes[index]+'</svg></div>'
